@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/shared/services/api_service.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
+import 'package:mobile/shared/services/shared_preferences.dart';
 
 class SplashScreen extends StatelessWidget {
   final storage = FlutterSecureStorage();
+  final UserInfoService userInfoService = UserInfoService();
 
   SplashScreen({super.key});
 
@@ -15,15 +19,14 @@ class SplashScreen extends StatelessWidget {
       final secureStorageService = SecureStorageService();
       final accessToken = await secureStorageService.getAccess();
       final refreshToken = await secureStorageService.getRefresh();
-      print('Access Token: $accessToken');
-      print('Refresh Token: $refreshToken');
 
       if (accessToken != null && refreshToken != null) {
         ApiService apiService = ApiService();
         final response = await apiService.get('auth/profile');
 
         if (response.statusCode == 200) {
-          print(response.body);
+          final user = jsonDecode(response.body);
+          userInfoService.saveUser(user);
           context.go('/home');
         } else {
           context.go('/login');

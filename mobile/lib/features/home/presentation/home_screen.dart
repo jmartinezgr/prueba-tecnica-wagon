@@ -1,13 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/shared/services/secure_storage_service.dart';
+import 'package:mobile/shared/services/shared_preferences.dart';
 
-class HomeScreen extends StatelessWidget {
-  final storage = const FlutterSecureStorage();
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  Future<void> _logout(BuildContext context) async {
-    await storage.delete(key: 'auth_token');
-    context.go('/auth');
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final SecureStorageService secureStorageService = SecureStorageService();
+  final UserInfoService userInfoService = UserInfoService();
+
+  Map<String, dynamic>? user;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final loadedUser = await userInfoService.getUser();
+    if (mounted) {
+      setState(() {
+        user = loadedUser;
+      });
+    }
+  }
+
+  Future<void> _logout() async {
+    await secureStorageService.deleteAccess();
+    await secureStorageService.deleteRefresh();
+    await userInfoService.deleteUser();
+    if (mounted) context.go('/auth');
   }
 
   @override
@@ -15,10 +43,21 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () => _logout(context),
-          child: const Text('Cerrar sesión'),
-        ),
+        child: user == null
+            ? const CircularProgressIndicator()
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Email: ${user!['email']}'),
+                  Text('Nombre: ${user!['name']}'),
+                  Text('Creado: ${user!['createdAt']}'),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _logout,
+                    child: const Text('Cerrar sesión'),
+                  ),
+                ],
+              ),
       ),
     );
   }

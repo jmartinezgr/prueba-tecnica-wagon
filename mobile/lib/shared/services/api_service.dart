@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'secure_storage_service.dart';
 
+//TODO : Implementar métodos para manejar errores de token para evaluar refrescarlos y sino redirigir al login
 class ApiService {
   final _storage = SecureStorageService();
 
@@ -21,7 +22,7 @@ class ApiService {
   Future<http.Response> post(String endpoint, Map<String, dynamic> body) async {
     final token = await _storage.getAccess();
     final uri = Uri.parse('http://10.0.2.2:3000/api/v1/$endpoint');
-    print("POST request to $uri with body: $body");
+
     return await http.post(
       uri,
       headers: {

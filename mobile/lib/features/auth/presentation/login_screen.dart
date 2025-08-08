@@ -4,11 +4,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/shared/services/api_service.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
+import 'package:mobile/shared/services/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   final storage = const FlutterSecureStorage();
+  final userInfoService = UserInfoService();
 
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
 
   Future<void> _login(BuildContext context) async {
     ApiService apiService = ApiService();
@@ -24,13 +26,14 @@ class LoginScreen extends StatelessWidget {
       if (accessToken != null && refreshToken != null) {
         await secureStorageService.saveAccess(accessToken);
         await secureStorageService.saveRefresh(refreshToken);
+        print(body['user']);
+        await userInfoService.saveUser(body['user']);
         context.go('/home');
       } else {
         // Manejar caso sin token en respuesta
         _showError(context, 'Token no recibido');
       }
     } else {
-      print("paso como error");
       _showError(context, response.body.toString());
     }
   }
