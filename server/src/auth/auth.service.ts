@@ -8,10 +8,14 @@ import { RegisterDTO } from './dto/register.dto';
 
 import * as bcryptjs from 'bcryptjs';
 import { LoginDTO } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register(payload: RegisterDTO) {
     const user = await this.usersService.findOneByEmail(payload.email);
@@ -19,10 +23,25 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
     const hashedPassword = await bcryptjs.hash(payload.password, 10);
-    return await this.usersService.create({
+
+    const createdUser = await this.usersService.create({
       ...payload,
       password: hashedPassword,
     });
+
+    const JWTpayload = {
+      email: createdUser.email,
+      sub: createdUser.id,
+    };
+
+    const accessToken = this.jwtService.sign(JWTpayload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(JWTpayload, { expiresIn: '7d' });
+
+    return {
+      accessToken,
+      refreshToken,
+      ...createdUser,
+    };
   }
 
   async login(payload: LoginDTO) {
@@ -37,6 +56,20 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    return { message: 'Login successful' };
+
+    const JWTpayload = {
+      email: user.email,
+      sub: user.id,
+    };
+
+    const accessToken = this.jwtService.sign(JWTpayload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(JWTpayload, { expiresIn: '7d' });
+
+    return {
+      message: 'Login successful',
+      accessToken,
+      refreshToken,
+      user: { email: user.email, name: user.name },
+    };
   }
 }

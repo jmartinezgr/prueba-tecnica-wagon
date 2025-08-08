@@ -10,6 +10,7 @@ interface EnvVars {
   POSTGRES_USER: string;
   POSTGRES_PASSWORD: string;
   POSTGRES_DB: string;
+  SECRET: string;
 }
 
 // Definir el esquema de validación
@@ -19,6 +20,7 @@ const envsSchema = Joi.object<EnvVars>({
   POSTGRES_USER: Joi.string().required(),
   POSTGRES_PASSWORD: Joi.string().required(),
   POSTGRES_DB: Joi.string().required(),
+  SECRET: Joi.string().required(),
 }).unknown(true); // Permite variables adicionales en `process.env`
 
 // Validar las variables de entorno
@@ -37,4 +39,5 @@ export const envs = {
   POSTGRES_USER: envVars.POSTGRES_USER,
   POSTGRES_PASSWORD: envVars.POSTGRES_PASSWORD,
   POSTGRES_DB: envVars.POSTGRES_DB,
+  SECRET: envVars.SECRET,
 };
