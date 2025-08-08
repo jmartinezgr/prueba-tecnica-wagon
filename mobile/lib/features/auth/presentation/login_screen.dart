@@ -1,14 +1,44 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/shared/services/api_service.dart';
+import 'package:mobile/shared/services/secure_storage_service.dart';
 
 class LoginScreen extends StatelessWidget {
   final storage = const FlutterSecureStorage();
 
+  const LoginScreen({super.key});
+
   Future<void> _login(BuildContext context) async {
-    // Simulación: guardamos un token
-    await storage.write(key: 'auth_token', value: 'fake_token');
-    context.go('/home');
+    ApiService apiService = ApiService();
+    SecureStorageService secureStorageService = SecureStorageService();
+    const data = {'email': 'josemargri3@gmail.com', 'password': '++juanjose3M'};
+
+    final response = await apiService.post('auth/login', data);
+
+    if (response.statusCode == 201) {
+      final body = jsonDecode(response.body);
+      final accessToken = body['accessToken'];
+      final refreshToken = body['refreshToken'];
+      if (accessToken != null && refreshToken != null) {
+        await secureStorageService.saveAccess(accessToken);
+        await secureStorageService.saveRefresh(refreshToken);
+        context.go('/home');
+      } else {
+        // Manejar caso sin token en respuesta
+        _showError(context, 'Token no recibido');
+      }
+    } else {
+      print("paso como error");
+      _showError(context, response.body.toString());
+    }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

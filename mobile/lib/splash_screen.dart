@@ -15,6 +15,8 @@ class SplashScreen extends StatelessWidget {
       final secureStorageService = SecureStorageService();
       final accessToken = await secureStorageService.getAccess();
       final refreshToken = await secureStorageService.getRefresh();
+      print('Access Token: $accessToken');
+      print('Refresh Token: $refreshToken');
 
       if (accessToken != null && refreshToken != null) {
         ApiService apiService = ApiService();
