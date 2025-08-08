@@ -9,6 +9,7 @@ import { RegisterDTO } from './dto/register.dto';
 import * as bcryptjs from 'bcryptjs';
 import { LoginDTO } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { AppJwtPayload } from './types/auth.guard.types';
 
 @Injectable()
 export class AuthService {
@@ -71,5 +72,12 @@ export class AuthService {
       refreshToken,
       user: { email: user.email, name: user.name },
     };
+  }
+
+  async getProfile(userPayload: AppJwtPayload) {
+    const user = await this.usersService.findOneByEmail(userPayload.email);
+    const userWithoutPassword = { ...user, password: undefined };
+
+    return userWithoutPassword;
   }
 }
