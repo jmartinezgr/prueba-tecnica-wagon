@@ -23,7 +23,7 @@ import { TasksModule } from './tasks/tasks.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    MongooseModule.forRoot(envs.MONGO_URI, {}),
+    MongooseModule.forRoot(envs.MONGODB_URI, {}),
     UsersModule,
     TasksModule,
   ],

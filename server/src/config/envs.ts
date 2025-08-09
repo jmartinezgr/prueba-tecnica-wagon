@@ -42,5 +42,5 @@ export const envs = {
   POSTGRES_PASSWORD: envVars.POSTGRES_PASSWORD,
   POSTGRES_DB: envVars.POSTGRES_DB,
   SECRET: envVars.SECRET,
-  MONGO_URI: envVars.MONGODB_URI,
+  MONGODB_URI: envVars.MONGODB_URI,
 };
