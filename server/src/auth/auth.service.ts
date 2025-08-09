@@ -41,7 +41,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
-      ...createdUser,
+      ...{ ...createdUser, password: undefined },
     };
   }
 
@@ -70,7 +70,7 @@ export class AuthService {
       message: 'Login successful',
       accessToken,
       refreshToken,
-      user: { email: user.email, name: user.name },
+      user: { ...user, password: undefined },
     };
   }
 
