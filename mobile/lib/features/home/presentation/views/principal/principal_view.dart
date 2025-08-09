@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile/features/home/domain/days_service.dart';
 import 'package:mobile/features/home/presentation/views/principal/widgets/days_calendar_widget.dart';
-import 'package:mobile/features/home/presentation/views/principal/widgets/tasks_list_widget.dart';
+import 'package:mobile/shared/widgets/tasks_list_widget.dart';
 import 'package:mobile/features/home/presentation/views/principal/widgets/week_navigation_widget.dart';
 import 'package:mobile/shared/services/api_service.dart';
 import 'package:mobile/shared/widgets/confirm_dialog.dart';

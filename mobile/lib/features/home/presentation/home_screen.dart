@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/features/home/presentation/views/principal/principal_view.dart';
-import 'package:mobile/features/home/presentation/views/notifications_view.dart';
+import 'package:mobile/features/home/presentation/views/unprogrammed_tasks_view.dart';
 import 'package:mobile/features/home/presentation/views/profile_view.dart';
-import 'package:mobile/features/home/presentation/views/search_view.dart';
+import 'package:mobile/features/home/presentation/views/createTask/create_task_view.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
 import 'package:mobile/shared/services/shared_preferences.dart';
 
@@ -45,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _getScreens() {
     return [
       PrincipalView(user: user),
-      const SearchView(),
-      const NotificationsView(),
+      const CreateTaskView(),
+      const UnprogrammedTasksView(),
       ProfileView(user: user, onLogout: _logout),
     ];
   }
@@ -69,7 +69,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_getAppBarTitle()), elevation: 2),
+      appBar: AppBar(
+        title: Text(_getAppBarTitle()),
+        elevation: 2,
+        backgroundColor: Colors.white, // Puedes cambiar el color aquí
+      ),
       body: user == null
           ? const Center(child: CircularProgressIndicator())
           : IndexedStack(index: _currentIndex, children: _getScreens()),
@@ -84,10 +88,10 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.dashboard),
             label: 'Dashboard',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Buscar'),
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Agregar'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notificaciones',
+            icon: Icon(Icons.list), // Cambiado a un ícono de lista
+            label: 'No Programadas',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
