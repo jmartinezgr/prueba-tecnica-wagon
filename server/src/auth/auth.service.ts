@@ -80,4 +80,31 @@ export class AuthService {
 
     return userWithoutPassword;
   }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload: AppJwtPayload = this.jwtService.verify(refreshToken);
+      const user = await this.usersService.findOneByEmail(payload.email);
+      if (!user) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const newAccessToken = this.jwtService.sign(
+        { email: user.email, sub: user.id },
+        { expiresIn: '1h' },
+      );
+
+      const newRefreshToken = this.jwtService.sign(
+        { email: user.email, sub: user.id },
+        { expiresIn: '7d' },
+      );
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
 }

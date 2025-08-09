@@ -24,4 +24,9 @@ export class AuthController {
   getProfile(@Req() req: authGuardTypes.AuthenticatedRequest) {
     return this.authService.getProfile(req.user);
   }
+
+  @Post('refresh')
+  refresh(@Body() payload: { refreshToken: string }) {
+    return this.authService.refreshToken(payload.refreshToken);
+  }
 }
