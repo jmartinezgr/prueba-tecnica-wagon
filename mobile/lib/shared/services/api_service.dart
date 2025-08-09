@@ -2,13 +2,16 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 import 'secure_storage_service.dart';
 
 class ApiService {
   final _storage = SecureStorageService();
-  final String _baseUrl = 'http://10.0.2.2:3000/api/v1';
+
+  final String _baseUrl =
+      dotenv.env['API_BASE'] ?? "http://10.0.2.2:3000/api/v1";
 
   Future<http.Response> get(String endpoint, {BuildContext? context}) async {
     return _sendRequest('GET', endpoint, context: context);

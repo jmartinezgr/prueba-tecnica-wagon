@@ -9,11 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  go_router: ^14.2.0 # o la última versión estable
+  go_router: ^14.2.0
   flutter_secure_storage: ^9.2.2
   http: ^1.2.1
   shared_preferences: ^2.1.1
-
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -22,3 +22,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env
