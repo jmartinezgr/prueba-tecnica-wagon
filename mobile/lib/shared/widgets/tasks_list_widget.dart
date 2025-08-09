@@ -26,13 +26,22 @@ class TasksListWidget extends StatelessWidget {
     if (loading || isLoadingTasks) {
       return _buildLoadingState();
     }
+    // RefreshIndicator envuelve tanto la lista como el estado vacío
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: tasks.isEmpty
+          ? _buildEmptyStateWithScroll(
+              context,
+            ) // Estado vacío con scroll habilitado
+          : _buildTasksList(), // Lista normal
+    );
+  }
 
-    if (tasks.isEmpty) {
-      return _buildEmptyState();
-    }
-
+  /// Widget principal de la lista de tareas con scroll
+  Widget _buildTasksList() {
     return ListView.builder(
       padding: const EdgeInsets.all(20),
+      physics: const AlwaysScrollableScrollPhysics(), // Permite scroll siempre
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
@@ -49,6 +58,7 @@ class TasksListWidget extends StatelessWidget {
     );
   }
 
+  /// Estado de carga sin RefreshIndicator (para evitar conflicto)
   Widget _buildLoadingState() {
     return const Center(
       child: Column(
@@ -62,7 +72,21 @@ class TasksListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  /// Estado vacío con scroll habilitado para permitir pull-to-refresh
+  Widget _buildEmptyStateWithScroll(BuildContext context) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6, // Altura mínima
+          child: _buildEmptyStateContent(),
+        ),
+      ],
+    );
+  }
+
+  /// Contenido del estado vacío reutilizable
+  Widget _buildEmptyStateContent() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -91,8 +115,17 @@ class TasksListWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Disfruta tu día libre o añade una nueva tarea',
+            'Visualiza las tareas o añade una nueva',
             style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Desliza hacia abajo para recargar',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade400,
+              fontStyle: FontStyle.italic,
+            ),
           ),
         ],
       ),
