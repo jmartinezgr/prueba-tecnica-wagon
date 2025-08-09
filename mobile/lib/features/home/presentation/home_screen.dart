@@ -77,11 +77,41 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Función para navegar a editar tarea
+  void _editTask(taskId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateTaskView(
+          taskId: taskId,
+          onTaskSaved: () {
+            // Actualizar las vistas cuando se guarde la tarea
+            _refreshPrincipalView();
+            _refreshUnprogrammedTasks();
+            Navigator.of(context).pop(); // Cerrar la pantalla de edición
+          },
+        ),
+      ),
+    );
+  }
+
   List<Widget> _getScreens() {
     return [
-      PrincipalView(key: _principalViewKey, user: user),
-      const CreateTaskView(),
-      UnprogrammedTasksView(key: _unprogrammedTasksKey),
+      PrincipalView(
+        key: _principalViewKey,
+        user: user,
+        onEditTask: _editTask, // Pasar la función de edición
+      ),
+      CreateTaskView(
+        onTaskSaved: () {
+          // Cuando se cree una nueva tarea, actualizar las vistas
+          _refreshPrincipalView();
+          _refreshUnprogrammedTasks();
+        },
+      ),
+      UnprogrammedTasksView(
+        key: _unprogrammedTasksKey,
+        onEditTask: _editTask, // Pasar la función de edición
+      ),
     ];
   }
 

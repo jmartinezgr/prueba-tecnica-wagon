@@ -11,8 +11,13 @@ import 'package:mobile/shared/widgets/confirm_dialog.dart';
 
 class PrincipalView extends StatefulWidget {
   final Map<String, dynamic>? user;
+  final Function(dynamic) onEditTask;
 
-  const PrincipalView({super.key, required this.user});
+  const PrincipalView({
+    super.key,
+    required this.user,
+    required this.onEditTask,
+  });
 
   @override
   State<PrincipalView> createState() => _PrincipalViewState();
@@ -210,6 +215,7 @@ class _PrincipalViewState extends State<PrincipalView>
               onRefresh: _fetchTasksForSelectedDay,
               onToggleTask: _toggleTask,
               onDeleteTask: _deleteTask,
+              onEditTask: widget.onEditTask,
             ),
           ),
         ],

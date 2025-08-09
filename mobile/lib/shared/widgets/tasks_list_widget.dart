@@ -8,6 +8,7 @@ class TasksListWidget extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final Function(dynamic, bool?) onToggleTask;
   final Function(dynamic) onDeleteTask;
+  final Function(dynamic) onEditTask;
 
   const TasksListWidget({
     super.key,
@@ -17,6 +18,7 @@ class TasksListWidget extends StatelessWidget {
     required this.onRefresh,
     required this.onToggleTask,
     required this.onDeleteTask,
+    required this.onEditTask,
   });
 
   @override
@@ -35,11 +37,13 @@ class TasksListWidget extends StatelessWidget {
       itemBuilder: (context, index) {
         final task = tasks[index];
         return TaskCardWidget(
+          taskId: task["_id"],
           title: task["title"] ?? "Sin título",
           description: task["description"] ?? "Sin descripción",
           isChecked: task["isCompleted"] ?? false,
           onChanged: (value) => onToggleTask(task["_id"], value),
           onDelete: () => onDeleteTask(task["_id"]),
+          onEdit: onEditTask,
         );
       },
     );

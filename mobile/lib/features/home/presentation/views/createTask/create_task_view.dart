@@ -1,3 +1,4 @@
+// views/createTask/create_task_view.dart
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
@@ -22,9 +23,12 @@ class TaskValidation {
   }
 }
 
-// Vista principal simplificada
+// Vista principal que maneja crear y editar
 class CreateTaskView extends StatefulWidget {
-  const CreateTaskView({super.key});
+  final String? taskId; // Si es null, crear nueva tarea
+  final Function()? onTaskSaved; // Callback cuando se guarde la tarea
+
+  const CreateTaskView({super.key, this.taskId, this.onTaskSaved});
 
   @override
   State<CreateTaskView> createState() => _CreateTaskViewState();
@@ -38,6 +42,16 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
   DateTime? _selectedDate;
   bool _isLoading = false;
+  bool _isLoadingTask = false;
+  bool get _isEditing => widget.taskId != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEditing) {
+      _loadTask();
+    }
+  }
 
   @override
   void dispose() {
@@ -46,10 +60,50 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     super.dispose();
   }
 
+  Future<void> _loadTask() async {
+    if (!_isEditing) return;
+
+    setState(() => _isLoadingTask = true);
+
+    try {
+      final response = await _apiService.get(
+        'tasks/${widget.taskId}',
+        context: context,
+      );
+
+      if (response.statusCode == 200) {
+        final taskData = json.decode(response.body);
+
+        if (mounted) {
+          setState(() {
+            _titleController.text = taskData['title'] ?? '';
+            _descriptionController.text = taskData['description'] ?? '';
+
+            if (taskData['estimatedDate'] != null) {
+              _selectedDate = DateTime.parse(taskData['estimatedDate']);
+            }
+          });
+        }
+      } else {
+        if (mounted) {
+          _showMessage('Error al cargar la tarea', Colors.red);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showMessage('Error al cargar la tarea: $e', Colors.red);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingTask = false);
+      }
+    }
+  }
+
   Future<void> _selectDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
@@ -63,7 +117,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     setState(() => _selectedDate = null);
   }
 
-  Future<void> _createTask() async {
+  Future<void> _saveTask() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -75,17 +129,37 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         'estimatedDate': DaysService().formatToISO(_selectedDate),
       };
 
-      final response = await _apiService.post(
-        'tasks',
-        taskData,
-        context: context,
-      );
-      final data = json.decode(response.body);
+      late final response;
 
-      if (response.statusCode == 201) {
+      if (_isEditing) {
+        // Actualizar tarea existente
+        response = await _apiService.patch(
+          'tasks/${widget.taskId}',
+          taskData,
+          context: context,
+        );
+      } else {
+        // Crear nueva tarea
+        response = await _apiService.post('tasks', taskData, context: context);
+      }
+
+      final data = json.decode(response.body);
+      final expectedStatusCode = _isEditing ? 200 : 201;
+
+      if (response.statusCode == expectedStatusCode) {
         if (mounted) {
-          _showMessage('Tarea creada exitosamente', Colors.green);
-          _clearForm();
+          final message = _isEditing
+              ? 'Tarea actualizada exitosamente'
+              : 'Tarea creada exitosamente';
+
+          _showMessage(message, Colors.green);
+
+          if (!_isEditing) {
+            _clearForm();
+          }
+
+          // Llamar callback si existe
+          widget.onTaskSaved?.call();
         }
       } else {
         if (mounted) {
@@ -94,7 +168,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       }
     } catch (e) {
       if (mounted) {
-        _showMessage('Error al crear la tarea: $e', Colors.red);
+        final action = _isEditing ? 'actualizar' : 'crear';
+        _showMessage('Error al $action la tarea: $e', Colors.red);
       }
     } finally {
       if (mounted) {
@@ -118,48 +193,101 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _isEditing
+          ? AppBar(
+              title: const Text('Editar Tarea'),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black87,
+              elevation: 1,
+            )
+          : null,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                CustomTextFormField(
-                  controller: _titleController,
-                  labelText: 'Título',
-                  prefixIcon: Icons.title,
-                  validator: TaskValidation.validateTitle,
-                  maxLength: 100,
-                ),
-                const SizedBox(height: 16),
+        child: _isLoadingTask
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!_isEditing) ...[
+                        Text(
+                          'Nueva Tarea',
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Completa los campos para crear una nueva tarea',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
 
-                CustomTextFormField(
-                  controller: _descriptionController,
-                  labelText: 'Descripción (opcional)',
-                  prefixIcon: Icons.description,
-                  maxLines: 3,
-                  maxLength: 500,
-                ),
-                const SizedBox(height: 16),
-
-                DatePickerField(
-                  selectedDate: _selectedDate,
-                  onSelectDate: _selectDate,
-                  onClearDate: _clearDate,
-                ),
-                const SizedBox(height: 24),
-
-                _isLoading
-                    ? const LoadingButton()
-                    : GradientButton(
-                        onPressed: _createTask,
-                        text: 'Crear Tarea',
+                      CustomTextFormField(
+                        controller: _titleController,
+                        labelText: 'Título',
+                        prefixIcon: Icons.title,
+                        validator: TaskValidation.validateTitle,
+                        maxLength: 100,
                       ),
-              ],
-            ),
-          ),
-        ),
+                      const SizedBox(height: 16),
+
+                      CustomTextFormField(
+                        controller: _descriptionController,
+                        labelText: 'Descripción (opcional)',
+                        prefixIcon: Icons.description,
+                        maxLines: 3,
+                        maxLength: 500,
+                      ),
+                      const SizedBox(height: 16),
+
+                      DatePickerField(
+                        selectedDate: _selectedDate,
+                        onSelectDate: _selectDate,
+                        onClearDate: _clearDate,
+                      ),
+                      const SizedBox(height: 24),
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: _isLoading
+                            ? const LoadingButton()
+                            : GradientButton(
+                                onPressed: _saveTask,
+                                text: _isEditing
+                                    ? 'Actualizar Tarea'
+                                    : 'Crear Tarea',
+                              ),
+                      ),
+
+                      if (_isEditing) ...[
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text(
+                              'Cancelar',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }

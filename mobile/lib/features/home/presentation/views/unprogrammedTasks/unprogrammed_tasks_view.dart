@@ -9,7 +9,8 @@ import 'package:mobile/shared/widgets/tasks_list_widget.dart';
 
 // Vista principal de Tareas No Programadas
 class UnprogrammedTasksView extends StatefulWidget {
-  const UnprogrammedTasksView({super.key});
+  final Function(dynamic) onEditTask;
+  const UnprogrammedTasksView({super.key, required this.onEditTask});
 
   @override
   State<UnprogrammedTasksView> createState() => _UnprogrammedTasksViewState();
@@ -153,6 +154,7 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
         onRefresh: _loadTasks,
         onToggleTask: _toggleTaskCompletion,
         onDeleteTask: _deleteTask,
+        onEditTask: widget.onEditTask, // Pasar la función de edición
       ),
     );
   }
