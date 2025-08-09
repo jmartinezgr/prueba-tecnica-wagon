@@ -9,7 +9,7 @@ import { RegisterDTO } from './dto/register.dto';
 import * as bcryptjs from 'bcryptjs';
 import { LoginDTO } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { AppJwtPayload } from './types/auth.guard.types';
+import { AppJwtPayload } from '../types/auth.guard.types';
 
 @Injectable()
 export class AuthService {
