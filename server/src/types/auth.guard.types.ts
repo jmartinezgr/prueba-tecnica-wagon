@@ -10,6 +10,7 @@ import { Request } from 'express';
  */
 export interface AuthenticatedRequest extends Request {
   user: AppJwtPayload;
+  headers: Request['headers']; // Asegura que tenga el tipo correcto de headers
 }
 
 /**
