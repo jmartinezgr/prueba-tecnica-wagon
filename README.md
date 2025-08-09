@@ -151,13 +151,41 @@ flutter run
 <!-- TODO: Agregar capturas de pantalla de la aplicación -->
 
 ### Pantalla de Login
-*[Captura pendiente]*
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/447aed6f-6b10-42d7-9f18-c3e513e4f492" width="376" height="644" />
+  <img src="https://github.com/user-attachments/assets/d5240065-e5bb-4ffd-b18c-1d815d7907fa" width="376" height="647" />
+  <img src="https://github.com/user-attachments/assets/d55b0174-dac5-4aa5-93a2-520d3ddc2cb9" width="375" height="645" />
+  <img src="https://github.com/user-attachments/assets/58f383ec-fffc-4f9e-a1ef-e16efafa9a57" width="377" height="649" />
+</p>
 
 ### Lista de Tareas
-*[Captura pendiente]*
+
+#### Tareas Programadas y No Programadas
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f5009bca-66c9-4452-800f-5f04033a4cad" width="375" height="650" />
+  <img src="https://github.com/user-attachments/assets/0649fc09-0e1c-4d69-95e0-35d139cc5499" width="372" height="645" />
+</p>
+
+#### Días Sin Tarea Programada
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a44ce5fe-b96f-4a5c-8e74-734120b8f817" width="378" height="651" />
+</p>
 
 ### Crear Nueva Tarea
-*[Captura pendiente]*
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/fefb20c8-1fad-4fd5-ada1-f5f1c48f29bf" width="376" height="643" />
+  <img src="https://github.com/user-attachments/assets/95d9f434-3aad-483b-936b-61b98b28b0d1" width="384" height="646" />
+</p>
+
+### Editar Tarea
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/1b691546-29e7-4092-96a2-f177814c73e1" width="375" height="646" />
+</p>
 
 ---
 
