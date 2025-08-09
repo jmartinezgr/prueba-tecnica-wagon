@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/shared/services/api_service.dart';
@@ -36,33 +38,47 @@ class _LoginScreenState extends State<LoginScreen> {
       'email': _emailController.text.trim(),
       'password': _passwordController.text.trim(),
     };
+    try {
+      final response = await apiService.post('auth/login', data);
 
-    final response = await apiService.post('auth/login', data);
+      setState(() => _loading = false);
 
-    setState(() => _loading = false);
+      if (response.statusCode == 201) {
+        final body = jsonDecode(response.body);
+        final accessToken = body['accessToken'];
+        final refreshToken = body['refreshToken'];
 
-    if (response.statusCode == 201) {
-      final body = jsonDecode(response.body);
-      final accessToken = body['accessToken'];
-      final refreshToken = body['refreshToken'];
+        if (accessToken != null && refreshToken != null) {
+          await secureStorageService.saveAccess(accessToken);
+          await secureStorageService.saveRefresh(refreshToken);
+          await userInfoService.saveUser(body['user']);
 
-      if (accessToken != null && refreshToken != null) {
-        await secureStorageService.saveAccess(accessToken);
-        await secureStorageService.saveRefresh(refreshToken);
-        await userInfoService.saveUser(body['user']);
-
-        context.go('/home');
+          context.go('/home');
+        } else {
+          _showError(context, 'Token no recibido');
+        }
+      } else if (response.statusCode == 500) {
+        _showError(context, "Ocurrio un error inesperado.");
+      } else if (response.statusCode == 404) {
+        _showError(
+          context,
+          "Ocurrion un error encontrando el servidor. Intenta de nuevo luego",
+        );
       } else {
-        _showError(context, 'Token no recibido');
-      }
-    } else {
-      final body = jsonDecode(response.body);
+        final body = jsonDecode(response.body);
 
-      if (body['message'] is List) {
-        _showError(context, (body['message'] as List).join(', '));
-      } else {
-        _showError(context, body['message'] ?? 'Error desconocido');
+        if (body['message'] is List) {
+          _showError(context, (body['message'] as List).join(', '));
+        } else {
+          _showError(context, body['message'] ?? 'Error desconocido');
+        }
       }
+    } on SocketException catch (_) {
+      _showError(context, "Error de conexión");
+    } on TimeoutException catch (_) {
+      _showError(context, "La conexión ha expirado");
+    } catch (_) {
+      _showError(context, 'Ocurrió un error inesperado. Intenta nuevamente.');
     }
   }
 

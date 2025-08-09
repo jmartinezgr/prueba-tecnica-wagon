@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -33,54 +35,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     ApiService apiService = ApiService();
+    try {
+      final response = await apiService.post('auth/register', {
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'password': _passwordController.text.trim(),
+      });
 
-    final response = await apiService.post('auth/register', {
-      'name': _nameController.text.trim(),
-      'email': _emailController.text.trim(),
-      'password': _passwordController.text.trim(),
-    });
+      setState(() => _isLoading = false);
+      if (response.statusCode == 201) {
+        final body = jsonDecode(response.body);
+        final accessToken = body['accessToken'];
+        final refreshToken = body['refreshToken'];
 
-    setState(() => _isLoading = false);
-    if (response.statusCode == 201) {
-      final body = jsonDecode(response.body);
-      final accessToken = body['accessToken'];
-      final refreshToken = body['refreshToken'];
+        if (accessToken != null && refreshToken != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Registro exitoso')));
+          await secureStorageService.saveAccess(accessToken);
+          await secureStorageService.saveRefresh(refreshToken);
+          body.remove('accessToken');
+          body.remove('refreshToken');
 
-      if (accessToken != null && refreshToken != null) {
-        ScaffoldMessenger.of(
+          // Guardamos solo la info del usuario
+          await userInfoService.saveUser(body);
+          context.go('/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error: Tokens no válidos')),
+          );
+        }
+      } else if (response.statusCode == 500) {
+        _showError(context, "Ocurrio un error inesperado.");
+      } else if (response.statusCode == 404) {
+        _showError(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Registro exitoso')));
-        await secureStorageService.saveAccess(accessToken);
-        await secureStorageService.saveRefresh(refreshToken);
-        body.remove('accessToken');
-        body.remove('refreshToken');
-
-        // Guardamos solo la info del usuario
-        await userInfoService.saveUser(body);
-        context.go('/home');
+          "Ocurrion un error encontrando el servidor. Intenta de nuevo luego",
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error: Tokens no válidos')),
-        );
+        final body = jsonDecode(response.body);
+        if (body['message'] is List) {
+          _showError(context, body['message'].join(', '));
+        } else if (body['message'] is String) {
+          _showError(context, body['message']);
+        }
       }
-    } else {
-      final body = jsonDecode(response.body);
-      if (body['message'] is List) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${body['message'].join(', ')}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      } else if (body['message'] is String) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${body['message']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    } on SocketException catch (_) {
+      _showError(context, "Error de conexión");
+    } on TimeoutException catch (_) {
+      _showError(context, "La conexión ha expirado");
+    } catch (_) {
+      _showError(context, 'Ocurrió un error inesperado. Intenta nuevamente.');
     }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   @override
