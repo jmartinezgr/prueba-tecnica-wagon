@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/features/home/presentation/views/principal_view.dart';
 import 'package:mobile/features/home/presentation/views/notifications_view.dart';
-import 'package:mobile/features/home/presentation/views/profile_view.dart';
+import 'package:mobile/features/home/presentation/views/principal/profile_view.dart';
 import 'package:mobile/features/home/presentation/views/search_view.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
 import 'package:mobile/shared/services/shared_preferences.dart';

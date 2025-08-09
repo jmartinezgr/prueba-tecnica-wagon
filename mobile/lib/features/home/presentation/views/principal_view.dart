@@ -3,6 +3,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile/features/home/domain/days_service.dart';
+import 'package:mobile/features/home/presentation/views/principal/widgets/days_calendar_widget.dart';
+import 'package:mobile/features/home/presentation/views/principal/widgets/tasks_list_widget.dart';
+import 'package:mobile/features/home/presentation/views/principal/widgets/week_navigation_widget.dart';
 import 'package:mobile/shared/services/api_service.dart';
 import 'package:mobile/shared/widgets/confirm_dialog.dart';
 
@@ -169,314 +172,27 @@ class _PrincipalViewState extends State<PrincipalView> {
       body: Column(
         children: [
           // Navegación de semana
-          _buildWeekNavigation(),
+          WeekNavigationWidget(
+            weekOffset: _weekOffset,
+            onPreviousWeek: () => _changeWeek(-1),
+            onNextWeek: () => _changeWeek(1),
+          ),
 
           // Calendario de días
-          _buildDaysCalendar(),
+          DaysCalendarWidget(days: _days, onDaySelected: _selectDay),
 
           // Lista de tareas
-          Expanded(child: _buildTasksList()),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeekNavigation() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () => _changeWeek(-1),
-            icon: Icon(Icons.chevron_left, color: Colors.grey.shade600),
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.grey.shade100,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-          Text(
-            _getWeekTitle(),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF2D3748),
-            ),
-          ),
-          IconButton(
-            onPressed: () => _changeWeek(1),
-            icon: Icon(Icons.chevron_right, color: Colors.grey.shade600),
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.grey.shade100,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+          Expanded(
+            child: TasksListWidget(
+              loading: _loading,
+              isLoadingTasks: _isLoadingTasks,
+              tasks: _tasks,
+              onRefresh: _fetchTasksForSelectedDay,
+              onToggleTask: _toggleTask,
+              onDeleteTask: _deleteTask,
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  String _getWeekTitle() {
-    if (_weekOffset == 0) return 'Esta semana';
-    if (_weekOffset == -1) return 'Semana anterior';
-    if (_weekOffset == 1) return 'Próxima semana';
-    return _weekOffset < 0
-        ? 'Hace ${-_weekOffset} semanas'
-        : 'En $_weekOffset semanas';
-  }
-
-  Widget _buildDaysCalendar() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: _days.asMap().entries.map((entry) {
-          final index = entry.key;
-          final day = entry.value;
-          final isSelected = day.$3;
-
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => _selectDay(index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? const LinearGradient(
-                          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                      : null,
-                  color: isSelected ? null : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                  border: isSelected
-                      ? null
-                      : Border.all(color: Colors.grey.shade200),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      day.$1.substring(0, 3), // Primeras 3 letras
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: isSelected ? Colors.white : Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      day.$2.toString(),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected
-                            ? Colors.white
-                            : const Color(0xFF2D3748),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildTasksList() {
-    if (_loading || _isLoadingTasks) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Cargando tareas...', style: TextStyle(color: Colors.grey)),
-          ],
-        ),
-      );
-    }
-
-    if (_tasks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Icon(
-                Icons.task_alt_outlined,
-                size: 50,
-                color: Colors.grey.shade400,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No hay tareas para este día',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Disfruta tu día libre o añade una nueva tarea',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _fetchTasksForSelectedDay,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: _tasks.length,
-        itemBuilder: (context, index) {
-          final task = _tasks[index];
-          return _buildProfessionalTaskCard(
-            title: task["title"] ?? "Sin título",
-            description: task["description"] ?? "Sin descripción",
-            isChecked: task["isCompleted"] ?? false,
-            onChanged: (value) => _toggleTask(task["_id"], value),
-            onDelete: () => _deleteTask(task["_id"]),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildProfessionalTaskCard({
-    required String title,
-    required String description,
-    required bool isChecked,
-    required ValueChanged<bool?> onChanged,
-    required VoidCallback onDelete,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Checkbox circular personalizado
-            GestureDetector(
-              onTap: () => onChanged(!isChecked),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: isChecked
-                      ? const LinearGradient(
-                          colors: [Color(0xFF4CAF50), Color(0xFF45a049)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                      : null,
-                  color: isChecked ? null : Colors.transparent,
-                  border: isChecked
-                      ? null
-                      : Border.all(color: Colors.grey.shade300, width: 2),
-                ),
-                child: isChecked
-                    ? const Icon(Icons.check, size: 16, color: Colors.white)
-                    : null,
-              ),
-            ),
-
-            const SizedBox(width: 16),
-
-            // Contenido de la tarea
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: isChecked
-                          ? Colors.grey.shade500
-                          : const Color(0xFF2D3748),
-                      decoration: isChecked ? TextDecoration.lineThrough : null,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (description.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        color: isChecked
-                            ? Colors.grey.shade400
-                            : Colors.grey.shade600,
-                        fontSize: 14,
-                        decoration: isChecked
-                            ? TextDecoration.lineThrough
-                            : null,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            // Botón de eliminar
-            GestureDetector(
-              onTap: onDelete,
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red.shade600,
-                  size: 20,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
