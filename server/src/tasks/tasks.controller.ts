@@ -35,9 +35,15 @@ export class TasksController {
     @Req() req: authGuardTypes.AuthenticatedRequest,
     @Query('date') date?: string,
     @Query('status') status?: boolean,
+    @Query('scheduled') scheduled?: boolean,
   ) {
     const userId = req.user.sub;
-    return this.tasksService.findUserTasksByUserId(userId, date, status);
+    return this.tasksService.findUserTasksByUserId(
+      userId,
+      date,
+      status,
+      scheduled,
+    );
   }
 
   @UseGuards(AuthGuard)

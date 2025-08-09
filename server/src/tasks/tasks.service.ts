@@ -30,7 +30,12 @@ export class TasksService {
     return createdTask.save();
   }
 
-  async findUserTasksByUserId(userId: number, date?: string, status?: boolean) {
+  async findUserTasksByUserId(
+    userId: number,
+    date?: string,
+    status?: boolean,
+    scheduled: boolean = true,
+  ) {
     const query: Record<string, any> = { userId };
 
     if (date) {
@@ -41,6 +46,13 @@ export class TasksService {
       end.setUTCDate(start.getUTCDate() + 1);
 
       query.estimatedDate = { $gte: start, $lt: end };
+    } else {
+      if (!scheduled) {
+        query.$or = [
+          { estimatedDate: { $exists: false } },
+          { estimatedDate: null },
+        ];
+      }
     }
 
     if (status !== undefined) {
