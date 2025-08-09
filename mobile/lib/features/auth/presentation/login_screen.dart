@@ -69,7 +69,12 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(
+            top: 5,
+            bottom: 20,
+            left: 20,
+            right: 20,
+          ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight:
@@ -134,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 40),
                     TextFormField(
                       controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.text,
                       enableSuggestions: false,
                       autocorrect: false,
                       decoration: InputDecoration(

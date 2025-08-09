@@ -148,7 +148,7 @@ class AuthLandingScreen extends StatelessWidget {
 
                 // Título de la app
                 const Text(
-                  'TeamWork',
+                  'Todoter',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -163,7 +163,7 @@ class AuthLandingScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    'Colabora, crea, alcanza juntos. Mejora el\ntrabajo en equipo con nuestra aplicación\nfácil de usar y gestiona cualquiera de tus\nproyectos.',
+                    'Organiza tu vida, cumple tus metas y vive sin caos, con una herramienta todo-en-uno que te ayuda a planificar, priorizar y hacer realidad lo que te propones, día tras día.',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey.shade600,
@@ -192,7 +192,7 @@ class AuthLandingScreen extends StatelessWidget {
                             ),
                           ),
                           child: const Text(
-                            'Sign in',
+                            'Iniciar sesión',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -218,7 +218,7 @@ class AuthLandingScreen extends StatelessWidget {
                             ),
                           ),
                           child: const Text(
-                            'Register',
+                            'Registrarse',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
