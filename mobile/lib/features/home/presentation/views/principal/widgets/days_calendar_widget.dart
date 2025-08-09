@@ -13,7 +13,6 @@ class DaysCalendarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
