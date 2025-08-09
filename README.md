@@ -131,7 +131,7 @@ flutter run
 - `PATCH /tasks/:id` - Actualizar tarea
 - `DELETE /tasks/:id` - Eliminar tarea
 
-**Documentación completa:** Ver [`docs/endpoints_guide.md.md`](docs/endpoints_guide.md.md)
+**Documentación completa:** Ver [`docs/endpoints_guide.md.md`](docs/endpoints_guide.md)
 
 ---
 
