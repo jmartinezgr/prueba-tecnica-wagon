@@ -131,7 +131,7 @@ flutter run
 - `PATCH /tasks/:id` - Actualizar tarea
 - `DELETE /tasks/:id` - Eliminar tarea
 
-**Documentación completa:** Ver [`docs/endpoints.md`](docs/endpoints.md)
+**Documentación completa:** Ver [`docs/endpoints_guide.md.md`](docs/endpoints_guide.md.md)
 
 ---
 
@@ -212,26 +212,9 @@ Núcleo funcional de la aplicación:
 - Integración con MongoDB para flexibilidad de datos
 
 ---
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
----
-
 ## 📞 Contacto
 
-**Desarrollador:** José Martínez  
+**Desarrollador:** Juan José Martínez  
 **GitHub:** [@jmartinezgr](https://github.com/jmartinezgr)
 
 ---
