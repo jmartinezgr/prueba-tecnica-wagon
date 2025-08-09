@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+/// Displays the initial authentication landing page with branding, description, and navigation buttons.
 class AuthLandingScreen extends StatelessWidget {
+  /// Creates an AuthLandingScreen widget.
   const AuthLandingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Main UI for authentication landing: branding, description, and navigation buttons.
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -24,7 +27,7 @@ class AuthLandingScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 40),
 
-                // Imagen/Ilustración placeholder
+                // Illustration and decorative elements
                 Container(
                   height: 250,
                   margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -34,7 +37,7 @@ class AuthLandingScreen extends StatelessWidget {
                   ),
                   child: Stack(
                     children: [
-                      // Fondo con gradiente sutil
+                      // Subtle gradient background
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
@@ -48,7 +51,7 @@ class AuthLandingScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Elementos decorativos
+                      // Decorative elements (icons)
                       Positioned(
                         top: 40,
                         left: 40,

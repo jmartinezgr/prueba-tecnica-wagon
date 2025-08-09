@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Widget para el loading button
+/// Button widget that shows a loading spinner, used for async actions.
 class LoadingButton extends StatelessWidget {
   const LoadingButton({super.key});
 

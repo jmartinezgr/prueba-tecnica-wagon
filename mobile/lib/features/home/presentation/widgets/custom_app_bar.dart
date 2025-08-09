@@ -2,16 +2,22 @@
 import 'package:flutter/material.dart';
 import 'user_avatar.dart';
 
+/// Custom app bar for the home screen, displays page title and user avatar.
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Index of the current tab/page.
   final int currentIndex;
+
+  /// User information for displaying avatar.
   final Map<String, dynamic>? user;
 
+  /// Creates a CustomAppBar widget.
   const CustomAppBar({
     super.key,
     required this.currentIndex,
     required this.user,
   });
 
+  /// Returns the title for the current page based on the selected tab.
   String _getPageTitle() {
     switch (currentIndex) {
       case 0:
@@ -27,6 +33,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Builds the custom app bar with title, avatar, and notification icon.
     return AppBar(
       elevation: 2,
       backgroundColor: Colors.grey.shade50,
@@ -56,13 +63,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.notifications_outlined),
           color: Colors.black54,
           onPressed: () {
-            // Manejar notificaciones
+            // Handle notifications
           },
         ),
       ],
     );
   }
 
+  /// Returns the preferred size for the app bar.
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

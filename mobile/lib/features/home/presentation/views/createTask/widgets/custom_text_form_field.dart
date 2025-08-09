@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Widget reutilizable para inputs de texto
+/// Reusable widget for styled text input fields with validation and icon.
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;

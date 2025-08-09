@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/home/presentation/views/createTask/widgets/gradient_button.dart';
 
-// Widget para el selector de fecha
+/// Widget for selecting and displaying an optional date with clear and pick actions.
 class DatePickerField extends StatelessWidget {
   final DateTime? selectedDate;
   final VoidCallback onSelectDate;

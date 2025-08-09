@@ -1,13 +1,24 @@
 // widgets/user_avatar.dart
 import 'package:flutter/material.dart';
 
+/// Widget for displaying a user's avatar image or initials in a circular avatar.
 class UserAvatar extends StatelessWidget {
+  /// User information, used to extract avatar URL or initials.
   final Map<String, dynamic>? user;
+
+  /// Diameter of the avatar.
   final double size;
+
+  /// Background color for the avatar (if no image).
   final Color backgroundColor;
+
+  /// Text color for the initials.
   final Color textColor;
+
+  /// Font size for the initials (optional).
   final double? fontSize;
 
+  /// Creates a UserAvatar widget.
   const UserAvatar({
     super.key,
     required this.user,
@@ -17,6 +28,7 @@ class UserAvatar extends StatelessWidget {
     this.fontSize,
   });
 
+  /// Returns the user's initials based on their name, or 'U' if not available.
   String _getInitials() {
     final name = user?['name']?.toString() ?? 'U';
     if (name.isEmpty) return 'U';
@@ -30,6 +42,7 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Builds a circular avatar with image or initials.
     return CircleAvatar(
       radius: size / 2,
       backgroundColor: backgroundColor,

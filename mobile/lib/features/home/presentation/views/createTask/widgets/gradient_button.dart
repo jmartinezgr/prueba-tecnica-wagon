@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Widget reutilizable para botones con gradiente
+/// Reusable button widget with a blue gradient background and optional compact mode.
 class GradientButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String text;

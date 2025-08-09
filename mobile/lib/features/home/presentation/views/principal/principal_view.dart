@@ -9,10 +9,16 @@ import 'package:mobile/features/home/presentation/views/principal/widgets/week_n
 import 'package:mobile/shared/services/api_service.dart';
 import 'package:mobile/shared/widgets/confirm_dialog.dart';
 
+/// Main view for displaying the user's week, days, and tasks list.
+/// Handles week navigation, day selection, and task actions (edit, delete, toggle).
 class PrincipalView extends StatefulWidget {
+  /// User info (may be null if not loaded).
   final Map<String, dynamic>? user;
+
+  /// Callback to edit a task.
   final Function(dynamic) onEditTask;
 
+  /// Creates a PrincipalView widget.
   const PrincipalView({
     super.key,
     required this.user,
@@ -23,18 +29,34 @@ class PrincipalView extends StatefulWidget {
   State<PrincipalView> createState() => _PrincipalViewState();
 }
 
+/// State for PrincipalView. Manages week/day navigation, task loading, and task actions.
 class _PrincipalViewState extends State<PrincipalView>
     with AutomaticKeepAliveClientMixin {
+  /// Service for API requests.
   final ApiService _apiService = ApiService();
+
+  /// Service for week/day calculations.
   final DaysService _daysService = DaysService();
+
+  /// List of tasks for the selected day.
   List<Map<String, dynamic>> _tasks = [];
+
+  /// Whether the view is loading for the first time.
   bool _loading = true;
+
+  /// Whether tasks are being loaded for the selected day.
   bool _isLoadingTasks = false;
+
+  /// List of days in the current week (tuple: name, number, selected, isoDate).
   List<(String, int, bool, String)> _days = [];
+
+  /// Index of the currently selected day.
   int _selectedDayIndex = -1;
+
+  /// Offset from the current week (0 = this week).
   int _weekOffset = 0;
 
-  // Para mantener el estado cuando se cambia de pestaña
+  /// Keep state when switching tabs.
   @override
   bool get wantKeepAlive => true;
 
@@ -44,19 +66,19 @@ class _PrincipalViewState extends State<PrincipalView>
     _initializeView();
   }
 
-  // Método principal para inicializar/recargar la vista
+  /// Initializes the view: loads week days and fetches tasks for the selected day.
   Future<void> _initializeView() async {
     _loadWeekDays();
     await _fetchTasksForSelectedDay();
   }
 
+  /// Loads the days for the current week and selects the current day.
   void _loadWeekDays() {
     _days = _daysService.getWeekDays(offsetWeeks: _weekOffset);
-    _selectedDayIndex = _days.indexWhere(
-      (day) => day.$3,
-    ); // Buscar el día seleccionado
+    _selectedDayIndex = _days.indexWhere((day) => day.$3); // Find selected day
   }
 
+  /// Fetches tasks from the backend for the selected day.
   Future<void> _fetchTasksForSelectedDay() async {
     if (_selectedDayIndex == -1) return;
 
@@ -90,14 +112,15 @@ class _PrincipalViewState extends State<PrincipalView>
     }
   }
 
-  // Método público para recargar desde el exterior
+  /// Public method to refresh the view from outside.
   Future<void> refresh() async {
     await _initializeView();
   }
 
+  /// Deletes a task after confirmation dialog and updates the list.
   Future<void> _deleteTask(dynamic id) async {
     try {
-      // Mostrar diálogo de confirmación
+      // Show confirmation dialog
       final shouldDelete = await ConfirmDialog.show(
         context: context,
         title: 'Confirmar eliminación',
@@ -133,6 +156,7 @@ class _PrincipalViewState extends State<PrincipalView>
     }
   }
 
+  /// Toggles a task's completion status and updates the backend.
   Future<void> _toggleTask(dynamic id, bool? value) async {
     try {
       final index = _tasks.indexWhere((task) => task["_id"] == id);
@@ -167,12 +191,13 @@ class _PrincipalViewState extends State<PrincipalView>
     }
   }
 
+  /// Selects a day, updates the selected index, and fetches tasks for that day.
   void _selectDay(int index) {
     setState(() {
-      // Desmarcar el día anterior
+      // Unselect previous day
       _days = _days.map((day) => (day.$1, day.$2, false, day.$4)).toList();
 
-      // Marcar el nuevo día seleccionado
+      // Select new day
       _days[index] = (_days[index].$1, _days[index].$2, true, _days[index].$4);
       _selectedDayIndex = index;
     });
@@ -180,6 +205,7 @@ class _PrincipalViewState extends State<PrincipalView>
     _fetchTasksForSelectedDay();
   }
 
+  /// Changes the week offset and reloads days/tasks.
   void _changeWeek(int offset) {
     setState(() {
       _weekOffset += offset;
@@ -190,23 +216,23 @@ class _PrincipalViewState extends State<PrincipalView>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Necesario para AutomaticKeepAliveClientMixin
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       body: Column(
         children: [
-          // Navegación de semana
+          // Week navigation
           WeekNavigationWidget(
             weekOffset: _weekOffset,
             onPreviousWeek: () => _changeWeek(-1),
             onNextWeek: () => _changeWeek(1),
           ),
 
-          // Calendario de días
+          // Days calendar
           DaysCalendarWidget(days: _days, onDaySelected: _selectDay),
 
-          // Lista de tareas
+          // Tasks list
           Expanded(
             child: TasksListWidget(
               loading: _loading,

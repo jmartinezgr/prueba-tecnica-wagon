@@ -11,20 +11,30 @@ import 'widgets/custom_app_bar.dart';
 import 'widgets/custom_drawer.dart';
 import 'widgets/custom_bottom_navigation_bar.dart';
 
+/// Main screen for authenticated users, manages navigation, user state, and logout.
 class HomeScreen extends StatefulWidget {
+  /// Creates a HomeScreen widget.
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+/// State for HomeScreen, manages navigation, user info, and view refresh logic.
 class _HomeScreenState extends State<HomeScreen> {
+  /// Service for secure token storage.
   final SecureStorageService secureStorageService = SecureStorageService();
+
+  /// Service for storing user info.
   final UserInfoService userInfoService = UserInfoService();
+
+  /// Current index of the bottom navigation bar.
   int _currentIndex = 0;
+
+  /// Current user info, loaded from storage.
   Map<String, dynamic>? user;
 
-  // Keys para forzar reconstrucción de las vistas
+  // Keys to force view rebuilds
   GlobalKey<State> _principalViewKey = GlobalKey<State>();
   GlobalKey<State> _unprogrammedTasksKey = GlobalKey<State>();
 
@@ -34,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadUser();
   }
 
+  /// Loads user info from storage and updates state.
   Future<void> _loadUser() async {
     final loadedUser = await userInfoService.getUser();
     if (mounted) {
@@ -43,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Shows a confirmation dialog and logs out the user if confirmed.
   Future<void> _logout() async {
     final shouldLogout = await ConfirmDialog.show(
       context: context,
@@ -63,74 +75,71 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Handles tab changes in the bottom navigation bar and refreshes views as needed.
   void _onTabChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
 
-    // Si regresa al Dashboard (índice 0), forzar recarga
+    // If returning to Dashboard (index 0), force reload
     if (index == 0) {
       _refreshPrincipalView();
     }
 
-    // Si regresa a Tareas No Programadas (índice 2), forzar recarga
+    // If returning to Unprogrammed Tasks (index 2), force reload
     if (index == 2) {
       _refreshUnprogrammedTasks();
     }
   }
 
+  /// Forces the PrincipalView to rebuild by assigning a new key.
   void _refreshPrincipalView() {
     setState(() {
       _principalViewKey = GlobalKey<State>();
     });
   }
 
+  /// Forces the UnprogrammedTasksView to rebuild by assigning a new key.
   void _refreshUnprogrammedTasks() {
     setState(() {
       _unprogrammedTasksKey = GlobalKey<State>();
     });
   }
 
-  // Función para navegar a editar tarea
+  /// Navigates to the edit task screen and refreshes views on save.
   void _editTask(taskId) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => CreateTaskView(
           taskId: taskId,
           onTaskSaved: () {
-            // Actualizar las vistas cuando se guarde la tarea
+            // Refresh views when the task is saved
             _refreshPrincipalView();
             _refreshUnprogrammedTasks();
-            Navigator.of(context).pop(); // Cerrar la pantalla de edición
+            Navigator.of(context).pop();
           },
         ),
       ),
     );
   }
 
+  /// Returns the list of main screens for the IndexedStack.
   List<Widget> _getScreens() {
     return [
-      PrincipalView(
-        key: _principalViewKey,
-        user: user,
-        onEditTask: _editTask, // Pasar la función de edición
-      ),
+      PrincipalView(key: _principalViewKey, user: user, onEditTask: _editTask),
       CreateTaskView(
         onTaskSaved: () {
-          // Cuando se cree una nueva tarea, actualizar las vistas
           _refreshPrincipalView();
           _refreshUnprogrammedTasks();
         },
       ),
-      UnprogrammedTasksView(
-        key: _unprogrammedTasksKey,
-        onEditTask: _editTask, // Pasar la función de edición
-      ),
+      UnprogrammedTasksView(key: _unprogrammedTasksKey, onEditTask: _editTask),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    // Main UI for home: navigation, user info, and view switching.
     return Scaffold(
       appBar: CustomAppBar(currentIndex: _currentIndex, user: user),
       drawer: user != null

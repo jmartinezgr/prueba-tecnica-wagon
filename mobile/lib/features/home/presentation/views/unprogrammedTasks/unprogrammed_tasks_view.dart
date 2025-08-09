@@ -7,23 +7,35 @@ import 'package:mobile/shared/services/api_service.dart';
 import 'package:mobile/shared/widgets/confirm_dialog.dart';
 import 'package:mobile/shared/widgets/tasks_list_widget.dart';
 
-// Vista principal de Tareas No Programadas
+/// Main view for displaying and managing unprogrammed (unscheduled) tasks.
+/// Handles loading, toggling, deleting, and editing tasks.
 class UnprogrammedTasksView extends StatefulWidget {
+  /// Callback to edit a task.
   final Function(dynamic) onEditTask;
+
+  /// Creates an UnprogrammedTasksView widget.
   const UnprogrammedTasksView({super.key, required this.onEditTask});
 
   @override
   State<UnprogrammedTasksView> createState() => _UnprogrammedTasksViewState();
 }
 
+/// State for UnprogrammedTasksView. Manages loading, toggling, deleting, and editing unprogrammed tasks.
 class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
     with AutomaticKeepAliveClientMixin {
+  /// Service for API requests.
   final ApiService _apiService = ApiService();
+
+  /// List of unprogrammed tasks.
   List<Map<String, dynamic>> _tasks = [];
+
+  /// Whether the view is loading for the first time.
   bool _isLoading = true;
+
+  /// Whether a task action (toggle/delete) is loading.
   bool _isLoadingTasks = false;
 
-  // Para mantener el estado cuando se cambia de pestaña
+  /// Keep state when switching tabs.
   @override
   bool get wantKeepAlive => true;
 
@@ -33,21 +45,22 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
     _initializeView();
   }
 
-  // Método principal para inicializar/recargar la vista
+  /// Initializes the view and loads unprogrammed tasks.
   Future<void> _initializeView() async {
     await _loadTasks();
   }
 
-  // Método público para recargar desde el exterior
+  /// Public method to refresh the view from outside.
   Future<void> refresh() async {
     await _initializeView();
   }
 
+  /// Loads unprogrammed tasks from the backend.
   Future<void> _loadTasks() async {
     try {
       setState(() => _isLoading = true);
 
-      // Cambia este endpoint por el que necesites para tareas no programadas
+      // Fetch unprogrammed tasks (scheduled=false)
       final response = await _apiService.get(
         'tasks?scheduled=false',
         context: context,
@@ -67,16 +80,16 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
     }
   }
 
+  /// Toggles a task's completion status and updates the backend.
   Future<void> _toggleTaskCompletion(taskId, bool? isCompleted) async {
     try {
       setState(() => _isLoadingTasks = true);
 
-      // Cambia este endpoint por el que necesites para actualizar tareas
       await _apiService.patch('tasks/$taskId', {
         'isCompleted': isCompleted ?? false,
       }, context: context);
 
-      // Actualizar el estado local
+      // Update local state
       setState(() {
         final index = _tasks.indexWhere((task) => task['_id'] == taskId);
         if (index != -1) {
@@ -96,6 +109,7 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
     }
   }
 
+  /// Deletes a task after confirmation dialog and updates the list.
   Future<void> _deleteTask(taskId) async {
     try {
       setState(() => _isLoadingTasks = true);
@@ -113,10 +127,9 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
 
       if (!shouldDelete) return;
 
-      // Cambia este endpoint por el que necesites para eliminar tareas
       await _apiService.delete('tasks/$taskId', context: context);
 
-      // Remover de la lista local
+      // Remove from local list
       setState(() {
         _tasks.removeWhere((task) => task['_id'] == taskId);
         _isLoadingTasks = false;
@@ -129,12 +142,14 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
     }
   }
 
+  /// Shows a success message in a SnackBar.
   void _showSuccessMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
 
+  /// Shows an error message in a SnackBar.
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
@@ -143,7 +158,7 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Necesario para AutomaticKeepAliveClientMixin
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -154,7 +169,7 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
         onRefresh: _loadTasks,
         onToggleTask: _toggleTaskCompletion,
         onDeleteTask: _deleteTask,
-        onEditTask: widget.onEditTask, // Pasar la función de edición
+        onEditTask: widget.onEditTask, // Pass edit callback
       ),
     );
   }

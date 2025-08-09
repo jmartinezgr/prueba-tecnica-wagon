@@ -7,16 +7,22 @@ import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 import 'secure_storage_service.dart';
 
+/// Service for making authenticated HTTP requests to the backend API.
+/// Handles token management, refresh, and automatic logout on failure.
 class ApiService {
+  /// Service for secure storage of tokens.
   final _storage = SecureStorageService();
 
+  /// Base URL for API requests, loaded from environment or defaults to localhost.
   final String _baseUrl =
       dotenv.env['API_BASE'] ?? "http://10.0.2.2:3000/api/v1";
 
+  /// Sends a GET request to the given endpoint.
   Future<http.Response> get(String endpoint, {BuildContext? context}) async {
     return _sendRequest('GET', endpoint, context: context);
   }
 
+  /// Sends a POST request with a JSON body to the given endpoint.
   Future<http.Response> post(
     String endpoint,
     Map<String, dynamic> body, {
@@ -25,6 +31,7 @@ class ApiService {
     return _sendRequest('POST', endpoint, body: body, context: context);
   }
 
+  /// Sends a PATCH request with a JSON body to the given endpoint.
   Future<http.Response> patch(
     String endpoint,
     Map<String, dynamic> body, {
@@ -33,10 +40,13 @@ class ApiService {
     return _sendRequest('PATCH', endpoint, body: body, context: context);
   }
 
+  /// Sends a DELETE request to the given endpoint.
   Future<http.Response> delete(String endpoint, {BuildContext? context}) async {
     return _sendRequest('DELETE', endpoint, context: context);
   }
 
+  /// Internal method to send HTTP requests with authentication and handle token refresh.
+  /// If a 401 is received, tries to refresh the token and retry once. Logs out if refresh fails.
   Future<http.Response> _sendRequest(
     String method,
     String endpoint, {
@@ -49,14 +59,14 @@ class ApiService {
     http.Response response = await _makeHttpCall(method, uri, token, body);
 
     if (response.statusCode == 401) {
-      // Intentar refresh una sola vez
+      // Try to refresh token once
       bool refreshed = await _refreshToken();
       if (!refreshed) {
         await _logoutAndRedirect(context);
         return response;
       }
 
-      // Intentar nuevamente con token renovado
+      // Retry with new token
       token = await _storage.getAccess();
       response = await _makeHttpCall(method, uri, token, body);
 
@@ -68,6 +78,7 @@ class ApiService {
     return response;
   }
 
+  /// Helper to make the actual HTTP call with the given method, URI, token, and body.
   Future<http.Response> _makeHttpCall(
     String method,
     Uri uri,
@@ -93,6 +104,8 @@ class ApiService {
     }
   }
 
+  /// Attempts to refresh the access token using the stored refresh token.
+  /// Returns true if successful, false otherwise.
   Future<bool> _refreshToken() async {
     final refreshToken = await _storage.getRefresh();
     print(refreshToken);
@@ -115,11 +128,12 @@ class ApiService {
     return false;
   }
 
+  /// Logs out the user by deleting tokens and redirects to the auth screen if context is available.
   Future<void> _logoutAndRedirect(BuildContext? context) async {
     await _storage.deleteAccess();
     await _storage.deleteRefresh();
     if (context != null && context.mounted) {
-      context.go('/auth'); // Redirige con go_router
+      context.go('/auth'); // Redirects using go_router
     }
   }
 }

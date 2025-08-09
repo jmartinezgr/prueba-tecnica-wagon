@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 
+/// Widget for navigating between weeks. Shows arrows and current week label.
 class WeekNavigationWidget extends StatelessWidget {
+  /// Offset from the current week (0 = this week).
   final int weekOffset;
+
+  /// Callback for navigating to the previous week.
   final VoidCallback onPreviousWeek;
+
+  /// Callback for navigating to the next week.
   final VoidCallback onNextWeek;
 
+  /// Creates a WeekNavigationWidget.
   const WeekNavigationWidget({
     super.key,
     required this.weekOffset,

@@ -1,10 +1,15 @@
 // widgets/custom_bottom_navigation_bar.dart
 import 'package:flutter/material.dart';
 
+/// Custom bottom navigation bar for switching between main app sections.
 class CustomBottomNavigationBar extends StatelessWidget {
+  /// Index of the currently selected tab.
   final int currentIndex;
+
+  /// Callback when a tab is selected.
   final Function(int) onTabChanged;
 
+  /// Creates a CustomBottomNavigationBar widget.
   const CustomBottomNavigationBar({
     super.key,
     required this.currentIndex,
@@ -13,6 +18,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Builds the bottom navigation bar for main app navigation.
     return BottomNavigationBar(
       backgroundColor: Colors.grey.shade50,
       currentIndex: currentIndex,

@@ -3,12 +3,21 @@ import 'package:flutter/material.dart';
 import 'user_avatar.dart';
 import 'drawer_menu_item.dart';
 
+/// Custom navigation drawer for the home screen, displays user info and navigation options.
 class CustomDrawer extends StatelessWidget {
+  /// User information for displaying in the drawer header.
   final Map<String, dynamic>? user;
+
+  /// Index of the currently selected tab.
   final int currentIndex;
+
+  /// Callback when a tab is selected.
   final Function(int) onTabChanged;
+
+  /// Callback when logout is selected.
   final VoidCallback onLogout;
 
+  /// Creates a CustomDrawer widget.
   const CustomDrawer({
     super.key,
     required this.user,
@@ -19,6 +28,7 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Builds the navigation drawer with user info and menu items.
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -57,7 +67,7 @@ class CustomDrawer extends StatelessWidget {
             title: 'Configuración',
             onTap: () {
               Navigator.pop(context);
-              // Navegar a configuración
+              // Navigate to settings
             },
           ),
           DrawerMenuItem(
@@ -65,7 +75,7 @@ class CustomDrawer extends StatelessWidget {
             title: 'Ayuda',
             onTap: () {
               Navigator.pop(context);
-              // Navegar a ayuda
+              // Navigate to help
             },
           ),
           const Divider(),
@@ -82,6 +92,7 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
+  /// Builds the drawer header with user name, email, and avatar.
   Widget _buildDrawerHeader() {
     return UserAccountsDrawerHeader(
       decoration: const BoxDecoration(color: Colors.blue),

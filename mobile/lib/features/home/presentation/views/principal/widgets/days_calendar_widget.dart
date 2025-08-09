@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
+/// Widget that displays a horizontal calendar of days for the current week.
+/// Highlights the selected day and allows user to select a day.
 class DaysCalendarWidget extends StatelessWidget {
+  /// List of days (tuple: name, number, selected, isoDate).
   final List<(String, int, bool, String)> days;
+
+  /// Callback when a day is selected (index).
   final Function(int) onDaySelected;
 
+  /// Creates a DaysCalendarWidget.
   const DaysCalendarWidget({
     super.key,
     required this.days,

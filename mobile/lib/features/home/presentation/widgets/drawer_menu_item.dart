@@ -1,12 +1,21 @@
 // widgets/drawer_menu_item.dart
 import 'package:flutter/material.dart';
 
+/// Widget for a single menu item in the navigation drawer.
 class DrawerMenuItem extends StatelessWidget {
+  /// Icon to display for the menu item.
   final IconData icon;
+
+  /// Title text for the menu item.
   final String title;
+
+  /// Whether this item is currently selected.
   final bool isSelected;
+
+  /// Callback when the item is tapped.
   final VoidCallback onTap;
 
+  /// Creates a DrawerMenuItem widget.
   const DrawerMenuItem({
     super.key,
     required this.icon,
@@ -17,6 +26,7 @@ class DrawerMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Builds a styled ListTile for a drawer menu item.
     return ListTile(
       leading: Icon(icon, color: isSelected ? Colors.blue : null),
       title: Text(

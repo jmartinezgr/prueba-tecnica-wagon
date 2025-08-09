@@ -1,3 +1,5 @@
+/// Login screen for user authentication, handles login form, validation, and navigation.
+library;
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
@@ -9,24 +11,39 @@ import 'package:mobile/shared/services/api_service.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
 import 'package:mobile/shared/services/shared_preferences.dart';
 
+/// Displays the login form and manages authentication logic.
 class LoginScreen extends StatefulWidget {
+  /// Creates a LoginScreen widget.
   const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+/// State for LoginScreen, manages form, authentication, and UI state.
 class _LoginScreenState extends State<LoginScreen> {
+  /// Key for the login form.
   final _formKey = GlobalKey<FormState>();
+
+  /// Controller for the email input field.
   final TextEditingController _emailController = TextEditingController();
+
+  /// Controller for the password input field.
   final TextEditingController _passwordController = TextEditingController();
 
+  /// Service for secure token storage.
   final SecureStorageService secureStorageService = SecureStorageService();
+
+  /// Service for storing user info.
   final UserInfoService userInfoService = UserInfoService();
 
+  /// Whether the login process is loading.
   bool _loading = false;
+
+  /// Whether the password is obscured.
   bool _obscurePassword = true;
 
+  /// Handles login logic: validates form, sends request, saves tokens, and navigates.
   Future<void> _login(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -82,6 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Shows an error message in a SnackBar.
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
@@ -90,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Main UI for login: form, validation, loading, and navigation.
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -114,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Ícono/Logo
+                    // App icon/logo
                     Container(
                       width: 80,
                       height: 80,

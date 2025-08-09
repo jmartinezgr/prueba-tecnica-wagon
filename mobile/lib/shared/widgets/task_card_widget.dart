@@ -1,15 +1,31 @@
 // widgets/task_card_widget.dart
 import 'package:flutter/material.dart';
 
+/// Widget that displays a task card with title, description, checkbox, and action buttons.
+/// Allows editing, deleting, and toggling completion state of a task.
 class TaskCardWidget extends StatelessWidget {
+  /// Unique identifier for the task.
   final String taskId;
-  final String title;
-  final String description;
-  final bool isChecked;
-  final ValueChanged<bool?> onChanged;
-  final VoidCallback onDelete;
-  final Function(String taskId) onEdit; // Nueva función para editar
 
+  /// Title of the task.
+  final String title;
+
+  /// Description of the task.
+  final String description;
+
+  /// Whether the task is marked as completed.
+  final bool isChecked;
+
+  /// Callback when the checkbox is toggled.
+  final ValueChanged<bool?> onChanged;
+
+  /// Callback when the delete button is pressed.
+  final VoidCallback onDelete;
+
+  /// Callback when the edit button or card is tapped.
+  final Function(String taskId) onEdit;
+
+  /// Creates a TaskCardWidget.
   const TaskCardWidget({
     super.key,
     required this.taskId,
@@ -23,8 +39,9 @@ class TaskCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Makes the entire card tappable for editing.
     return GestureDetector(
-      onTap: () => onEdit(taskId), // Hacer toda la tarjeta clickeable
+      onTap: () => onEdit(taskId),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
@@ -45,15 +62,15 @@ class TaskCardWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // Checkbox circular personalizado
+                  // Custom circular checkbox
                   _buildCustomCheckbox(),
                   const SizedBox(width: 16),
 
-                  // Contenido de la tarea
+                  // Task content (title and description)
                   Expanded(child: _buildTaskContent()),
                   const SizedBox(width: 12),
 
-                  // Botones de acción
+                  // Action buttons (edit, delete)
                   _buildActionButtons(context),
                 ],
               ),
@@ -64,6 +81,7 @@ class TaskCardWidget extends StatelessWidget {
     );
   }
 
+  /// Builds a custom animated circular checkbox for marking task completion.
   Widget _buildCustomCheckbox() {
     return GestureDetector(
       onTap: () => onChanged(!isChecked),
@@ -92,6 +110,7 @@ class TaskCardWidget extends StatelessWidget {
     );
   }
 
+  /// Builds the main content of the task card: title and description.
   Widget _buildTaskContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,11 +143,12 @@ class TaskCardWidget extends StatelessWidget {
     );
   }
 
+  /// Builds the action buttons for editing and deleting the task.
   Widget _buildActionButtons(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Botón de editar
+        // Edit button
         GestureDetector(
           onTap: () => onEdit(taskId),
           child: Container(
@@ -147,7 +167,7 @@ class TaskCardWidget extends StatelessWidget {
         ),
         const SizedBox(width: 8),
 
-        // Botón de eliminar
+        // Delete button
         GestureDetector(
           onTap: onDelete,
           child: Container(

@@ -10,8 +10,9 @@ import 'package:mobile/features/home/presentation/views/createTask/widgets/gradi
 import 'package:mobile/features/home/presentation/views/createTask/widgets/loading_button.dart';
 import 'package:mobile/shared/services/api_service.dart';
 
-// Clase para manejar validaciones
+/// Utility class for task form validation.
 class TaskValidation {
+  /// Validates the title field for a task.
   static String? validateTitle(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'El título es obligatorio';
@@ -23,26 +24,45 @@ class TaskValidation {
   }
 }
 
-// Vista principal que maneja crear y editar
+/// Main view for creating or editing a task. Handles form, validation, and API calls.
 class CreateTaskView extends StatefulWidget {
-  final String? taskId; // Si es null, crear nueva tarea
-  final Function()? onTaskSaved; // Callback cuando se guarde la tarea
+  /// If not null, the view is in edit mode for the given task ID.
+  final String? taskId;
 
+  /// Callback when a task is successfully saved.
+  final Function()? onTaskSaved;
+
+  /// Creates a CreateTaskView widget.
   const CreateTaskView({super.key, this.taskId, this.onTaskSaved});
 
   @override
   State<CreateTaskView> createState() => _CreateTaskViewState();
 }
 
+/// State for CreateTaskView, manages form, loading, and save logic.
 class _CreateTaskViewState extends State<CreateTaskView> {
+  /// Controller for the title input field.
   final _titleController = TextEditingController();
+
+  /// Controller for the description input field.
   final _descriptionController = TextEditingController();
+
+  /// Key for the task form.
   final _formKey = GlobalKey<FormState>();
+
+  /// API service for backend requests.
   final _apiService = ApiService();
 
+  /// Selected date for the task (optional).
   DateTime? _selectedDate;
+
+  /// Whether the save operation is loading.
   bool _isLoading = false;
+
+  /// Whether the task is being loaded (edit mode).
   bool _isLoadingTask = false;
+
+  /// True if editing an existing task.
   bool get _isEditing => widget.taskId != null;
 
   @override
@@ -60,6 +80,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     super.dispose();
   }
 
+  /// Loads task data from the backend if editing, and populates the form.
   Future<void> _loadTask() async {
     if (!_isEditing) return;
 
@@ -100,6 +121,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     }
   }
 
+  /// Shows a date picker dialog and updates the selected date.
   Future<void> _selectDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -113,10 +135,12 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     }
   }
 
+  /// Clears the selected date.
   void _clearDate() {
     setState(() => _selectedDate = null);
   }
 
+  /// Saves the task (create or update) via API, validates form, and shows messages.
   Future<void> _saveTask() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -132,14 +156,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       late final response;
 
       if (_isEditing) {
-        // Actualizar tarea existente
+        // Update existing task
         response = await _apiService.patch(
           'tasks/${widget.taskId}',
           taskData,
           context: context,
         );
       } else {
-        // Crear nueva tarea
+        // Create new task
         response = await _apiService.post('tasks', taskData, context: context);
       }
 
@@ -158,7 +182,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
             _clearForm();
           }
 
-          // Llamar callback si existe
+          // Call callback if provided
           widget.onTaskSaved?.call();
         }
       } else {
@@ -178,12 +202,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     }
   }
 
+  /// Clears the form fields and selected date.
   void _clearForm() {
     _titleController.clear();
     _descriptionController.clear();
     setState(() => _selectedDate = null);
   }
 
+  /// Shows a message in a SnackBar with the given color.
   void _showMessage(String message, Color color) {
     ScaffoldMessenger.of(
       context,
@@ -192,6 +218,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
   @override
   Widget build(BuildContext context) {
+    // Main UI for creating or editing a task: form, validation, loading, and navigation.
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: _isEditing

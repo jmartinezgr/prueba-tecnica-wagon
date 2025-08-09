@@ -1,3 +1,5 @@
+/// Registration screen for new users, handles registration form, validation, and navigation.
+library;
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
@@ -10,25 +12,42 @@ import 'package:mobile/shared/services/api_service.dart' show ApiService;
 import 'package:mobile/shared/services/secure_storage_service.dart';
 import 'package:mobile/shared/services/shared_preferences.dart';
 
+/// Displays the registration form and manages user registration logic.
 class RegisterScreen extends StatefulWidget {
+  /// Creates a RegisterScreen widget.
   const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
+/// State for RegisterScreen, manages form, registration, and UI state.
 class _RegisterScreenState extends State<RegisterScreen> {
+  /// Key for the registration form.
   final _formKey = GlobalKey<FormState>();
+
+  /// Controller for the name input field.
   final TextEditingController _nameController = TextEditingController();
+
+  /// Controller for the email input field.
   final TextEditingController _emailController = TextEditingController();
+
+  /// Controller for the password input field.
   final TextEditingController _passwordController = TextEditingController();
 
+  /// Service for secure token storage.
   final SecureStorageService secureStorageService = SecureStorageService();
+
+  /// Service for storing user info.
   final UserInfoService userInfoService = UserInfoService();
 
+  /// Whether the registration process is loading.
   bool _isLoading = false;
+
+  /// Whether the password is obscured.
   bool _obscurePassword = true;
 
+  /// Handles registration logic: validates form, sends request, saves tokens, and navigates.
   Future<void> _register(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -57,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           body.remove('accessToken');
           body.remove('refreshToken');
 
-          // Guardamos solo la info del usuario
+          // Save only user info
           await userInfoService.saveUser(body);
           context.go('/home');
         } else {
@@ -89,6 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  /// Shows an error message in a SnackBar.
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
@@ -97,6 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Main UI for registration: form, validation, loading, and navigation.
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -121,7 +142,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Ícono/Logo
+                    // App icon/logo
                     Container(
                       width: 80,
                       height: 80,
@@ -172,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 40),
 
-                    // Campo Nombre
+                    // Name field
                     TextFormField(
                       controller: _nameController,
                       keyboardType: TextInputType.text,
@@ -207,7 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Campo Email
+                    // Email field
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.text,
@@ -242,7 +263,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Campo Contraseña
+                    // Password field
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
@@ -288,7 +309,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 30),
 
-                    // Botón Registrar
+                    // Register button
                     _isLoading
                         ? Container(
                             height: 56,
@@ -347,7 +368,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                     const SizedBox(height: 30),
 
-                    // Enlace a iniciar sesión
+                    // Link to login
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

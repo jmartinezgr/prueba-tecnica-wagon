@@ -1,17 +1,18 @@
+/// Service for week/day calculations and date formatting.
 class DaysService {
-  /// Retorna una lista de tuplas (díaNombre, díaNúmero, seleccionado, fechaISO)
-  /// [offsetWeeks] -> 0 = semana actual, -1 = anterior, +1 = siguiente, etc.
-  /// Si offsetWeeks < 0 => selecciona Domingo, si > 0 => selecciona Lunes, si 0 => día actual
+  /// Returns a list of tuples (dayName, dayNumber, selected, isoDate) for the week.
+  /// [offsetWeeks]: 0 = current week, -1 = previous, +1 = next, etc.
+  /// If offsetWeeks < 0 selects Sunday, > 0 selects Monday, 0 selects today.
   List<(String, int, bool, String)> getWeekDays({int offsetWeeks = 0}) {
     final now = DateTime.now();
 
-    // Ajustar la fecha base según el desplazamiento de semanas
+    // Adjust base date by week offset
     final baseDate = now.add(Duration(days: offsetWeeks * 7));
 
-    // Encontrar el lunes de la semana correspondiente
+    // Find Monday of the target week
     final monday = baseDate.subtract(Duration(days: baseDate.weekday - 1));
 
-    // Definir días de la semana
+    // Weekday names
     final daysNames = [
       'Lunes',
       'Martes',
@@ -22,17 +23,17 @@ class DaysService {
       'Domingo',
     ];
 
-    // Determinar índice del día seleccionado
+    // Determine selected day index
     int selectedIndex;
     if (offsetWeeks == 0) {
-      selectedIndex = now.weekday - 1; // día actual
+      selectedIndex = now.weekday - 1; // today
     } else if (offsetWeeks < 0) {
-      selectedIndex = 6; // domingo
+      selectedIndex = 6; // Sunday
     } else {
-      selectedIndex = 0; // lunes
+      selectedIndex = 0; // Monday
     }
 
-    // Generar lista de tuplas
+    // Generate list of tuples for each day
     final daysList = List.generate(7, (index) {
       final date = monday.add(Duration(days: index));
       final fechaISO =
@@ -43,6 +44,7 @@ class DaysService {
     return daysList;
   }
 
+  /// Formats a DateTime as an ISO date string (yyyy-MM-dd), or null if input is null.
   String? formatToISO(DateTime? date) {
     if (date == null) return null;
     return "${date.year.toString().padLeft(4, '0')}-"

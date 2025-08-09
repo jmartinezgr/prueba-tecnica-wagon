@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 
+/// Provides a static method to show a confirmation dialog and return the user's choice.
 class ConfirmDialog {
-  /// Muestra un diálogo de confirmación y retorna `true` si el usuario confirma.
+  /// Shows a confirmation dialog and returns `true` if the user confirms, `false` otherwise.
+  ///
+  /// [context]: BuildContext to display the dialog.
+  /// [title]: Title of the dialog.
+  /// [message]: Message body of the dialog.
+  /// [confirmText]: Text for the confirm button.
+  /// [cancelText]: Text for the cancel button.
+  /// [icon]: Icon to display in the dialog.
+  /// [iconColor]: Color of the icon.
+  /// [confirmColor]: Color of the confirm button.
   static Future<bool> show({
     required BuildContext context,
     String title = 'Confirmar acción',

@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 import 'task_card_widget.dart';
 
+/// Displays a list of tasks with support for loading, empty, and refresh states.
 class TasksListWidget extends StatelessWidget {
+  /// Whether the overall app is loading.
   final bool loading;
+
+  /// Whether the tasks are being loaded.
   final bool isLoadingTasks;
+
+  /// List of task objects to display.
   final List<Map<String, dynamic>> tasks;
+
+  /// Callback to refresh the list (pull-to-refresh).
   final Future<void> Function() onRefresh;
+
+  /// Callback when a task's completion state is toggled.
   final Function(dynamic, bool?) onToggleTask;
+
+  /// Callback when a task is deleted.
   final Function(dynamic) onDeleteTask;
+
+  /// Callback when a task is edited.
   final Function(dynamic) onEditTask;
 
+  /// Creates a TasksListWidget.
   const TasksListWidget({
     super.key,
     required this.loading,
@@ -23,25 +38,26 @@ class TasksListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Show loading indicator if loading.
     if (loading || isLoadingTasks) {
       return _buildLoadingState();
     }
-    // RefreshIndicator envuelve tanto la lista como el estado vacío
+    // Wraps the list or empty state with pull-to-refresh.
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: tasks.isEmpty
           ? _buildEmptyStateWithScroll(
               context,
-            ) // Estado vacío con scroll habilitado
-          : _buildTasksList(), // Lista normal
+            ) // Empty state with scroll enabled
+          : _buildTasksList(), // Normal list
     );
   }
 
-  /// Widget principal de la lista de tareas con scroll
+  /// Builds the main scrollable list of tasks.
   Widget _buildTasksList() {
     return ListView.builder(
       padding: const EdgeInsets.all(20),
-      physics: const AlwaysScrollableScrollPhysics(), // Permite scroll siempre
+      physics: const AlwaysScrollableScrollPhysics(),
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
@@ -58,7 +74,7 @@ class TasksListWidget extends StatelessWidget {
     );
   }
 
-  /// Estado de carga sin RefreshIndicator (para evitar conflicto)
+  /// Builds the loading state widget (centered spinner and message).
   Widget _buildLoadingState() {
     return const Center(
       child: Column(
@@ -72,20 +88,20 @@ class TasksListWidget extends StatelessWidget {
     );
   }
 
-  /// Estado vacío con scroll habilitado para permitir pull-to-refresh
+  /// Builds the empty state widget with scroll enabled for pull-to-refresh.
   Widget _buildEmptyStateWithScroll(BuildContext context) {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6, // Altura mínima
+          height: MediaQuery.of(context).size.height * 0.6,
           child: _buildEmptyStateContent(),
         ),
       ],
     );
   }
 
-  /// Contenido del estado vacío reutilizable
+  /// Builds the content for the empty state (icon and messages).
   Widget _buildEmptyStateContent() {
     return Center(
       child: Column(
