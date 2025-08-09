@@ -32,7 +32,7 @@ class SplashScreen extends StatelessWidget {
           context.go('/login');
         }
       } else {
-        context.go('/login');
+        context.go('/auth');
       }
     });
 
