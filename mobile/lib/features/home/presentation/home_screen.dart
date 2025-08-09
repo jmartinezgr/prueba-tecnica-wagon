@@ -6,6 +6,7 @@ import 'package:mobile/features/home/presentation/views/unprogrammedTasks/unprog
 import 'package:mobile/features/home/presentation/views/createTask/create_task_view.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
 import 'package:mobile/shared/services/shared_preferences.dart';
+import 'package:mobile/shared/widgets/confirm_dialog.dart';
 import 'widgets/custom_app_bar.dart';
 import 'widgets/custom_drawer.dart';
 import 'widgets/custom_bottom_navigation_bar.dart';
@@ -43,10 +44,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _logout() async {
-    await secureStorageService.deleteAccess();
-    await secureStorageService.deleteRefresh();
-    await userInfoService.deleteUser();
-    if (mounted) context.go('/auth');
+    final shouldLogout = await ConfirmDialog.show(
+      context: context,
+      title: 'Cerrar sesión',
+      message: '¿Estás seguro de que deseas cerrar sesión?',
+      confirmText: 'Cerrar sesión',
+      cancelText: 'Cancelar',
+      icon: Icons.logout,
+      iconColor: Colors.red,
+      confirmColor: Colors.redAccent,
+    );
+
+    if (shouldLogout) {
+      await secureStorageService.deleteAccess();
+      await secureStorageService.deleteRefresh();
+      await userInfoService.deleteUser();
+      if (mounted) context.go('/auth');
+    }
   }
 
   void _onTabChanged(int index) {
