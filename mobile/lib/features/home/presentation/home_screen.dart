@@ -51,26 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
-  String _getAppBarTitle() {
-    switch (_currentIndex) {
-      case 0:
-        return 'Dashboard';
-      case 1:
-        return 'Buscar';
-      case 2:
-        return 'Notificaciones';
-      case 3:
-        return 'Perfil';
-      default:
-        return 'Home';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_getAppBarTitle()),
         elevation: 2,
         backgroundColor: Colors.white, // Puedes cambiar el color aquí
       ),
