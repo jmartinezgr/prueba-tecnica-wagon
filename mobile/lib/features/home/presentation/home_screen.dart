@@ -1,11 +1,14 @@
+// home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/features/home/presentation/views/principal/principal_view.dart';
 import 'package:mobile/features/home/presentation/views/unprogrammedTasks/unprogrammed_tasks_view.dart';
-import 'package:mobile/features/home/presentation/views/profile_view.dart';
 import 'package:mobile/features/home/presentation/views/createTask/create_task_view.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
 import 'package:mobile/shared/services/shared_preferences.dart';
+import 'widgets/custom_app_bar.dart';
+import 'widgets/custom_drawer.dart';
+import 'widgets/custom_bottom_navigation_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -63,14 +66,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _refreshPrincipalView() {
-    // Forzar reconstrucción del PrincipalView creando un nuevo key
     setState(() {
       _principalViewKey = GlobalKey<State>();
     });
   }
 
   void _refreshUnprogrammedTasks() {
-    // Forzar reconstrucción del UnprogrammedTasksView creando un nuevo key
     setState(() {
       _unprogrammedTasksKey = GlobalKey<State>();
     });
@@ -81,35 +82,27 @@ class _HomeScreenState extends State<HomeScreen> {
       PrincipalView(key: _principalViewKey, user: user),
       const CreateTaskView(),
       UnprogrammedTasksView(key: _unprogrammedTasksKey),
-      ProfileView(user: user, onLogout: _logout),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(elevation: 2, backgroundColor: Colors.white),
+      appBar: CustomAppBar(currentIndex: _currentIndex, user: user),
+      drawer: user != null
+          ? CustomDrawer(
+              user: user,
+              currentIndex: _currentIndex,
+              onTabChanged: _onTabChanged,
+              onLogout: _logout,
+            )
+          : null,
       body: user == null
           ? const Center(child: CircularProgressIndicator())
           : IndexedStack(index: _currentIndex, children: _getScreens()),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: _onTabChanged, // Usar la nueva función
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Agregar'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'No Programadas',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
+        onTabChanged: _onTabChanged,
       ),
     );
   }
