@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -54,14 +56,20 @@ class _LoginScreenState extends State<LoginScreen> {
         _showError(context, 'Token no recibido');
       }
     } else {
-      _showError(context, response.body.toString());
+      final body = jsonDecode(response.body);
+
+      if (body['message'] is List) {
+        _showError(context, (body['message'] as List).join(', '));
+      } else {
+        _showError(context, body['message'] ?? 'Error desconocido');
+      }
     }
   }
 
   void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   @override

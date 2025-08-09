@@ -67,12 +67,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final body = jsonDecode(response.body);
       if (body['message'] is List) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${body['message'].join(', ')}')),
+          SnackBar(
+            content: Text('Error: ${body['message'].join(', ')}'),
+            backgroundColor: Colors.red,
+          ),
         );
       } else if (body['message'] is String) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${body['message']}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${body['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -192,7 +198,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     // Campo Email
                     TextFormField(
                       controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.text,
                       enableSuggestions: false,
                       autocorrect: false,
                       decoration: InputDecoration(
