@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
@@ -50,15 +50,39 @@ export class TasksService {
     return this.taskModel.find(query).exec();
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.taskModel.findById(id).exec();
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return this.taskModel.findByIdAndUpdate(id, updateTaskDto).exec();
+  async update(id: string, updateTaskDto: UpdateTaskDto, userId: number) {
+    const task = await this.taskModel.findById(id).exec();
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    if (task.userId !== userId) {
+      throw new UnauthorizedException();
+    }
+
+    return this.taskModel
+      .findByIdAndUpdate(
+        id,
+        { $set: updateTaskDto },
+        { new: true, runValidators: true },
+      )
+      .exec();
   }
 
-  remove(id: number) {
+  async remove(id: string, userId: number) {
+    const task = await this.taskModel.findById(id).exec();
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    if (task.userId !== userId) {
+      throw new UnauthorizedException();
+    }
+
     return this.taskModel.findByIdAndDelete(id).exec();
   }
 }

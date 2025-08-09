@@ -40,19 +40,31 @@ export class TasksController {
     return this.tasksService.findUserTasksByUserId(userId, date, status);
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(+id);
+    return this.tasksService.findOne(id);
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.tasksService.update(+id, updateTaskDto);
+  update(
+    @Req() req: authGuardTypes.AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
+    const userId = req.user.sub;
+    return this.tasksService.update(id, updateTaskDto, userId);
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  remove(
+    @Req() req: authGuardTypes.AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    const userId = req.user.sub;
+    return this.tasksService.remove(id, userId);
   }
 }
 import * as authGuardTypes from 'src/types/auth.guard.types';
