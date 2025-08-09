@@ -61,7 +61,10 @@ class _PrincipalViewState extends State<PrincipalView>
 
     try {
       final selectedDay = _days[_selectedDayIndex].$4;
-      final response = await _apiService.get("tasks?date=$selectedDay");
+      final response = await _apiService.get(
+        "tasks?date=$selectedDay",
+        context: context,
+      );
       final data = json.decode(response.body) as List<dynamic>;
       setState(() {
         _tasks = List<Map<String, dynamic>>.from(data);
@@ -103,8 +106,7 @@ class _PrincipalViewState extends State<PrincipalView>
 
       if (!shouldDelete) return;
 
-      // TODO: Descomenta cuando esté listo
-      // await _apiService.delete("/tasks/$id");
+      await _apiService.delete("tasks/$id", context: context);
 
       setState(() {
         _tasks.removeWhere((task) => task["_id"] == id);
@@ -134,8 +136,9 @@ class _PrincipalViewState extends State<PrincipalView>
           _tasks[index]["isCompleted"] = value ?? false;
         });
 
-        // TODO: Descomenta cuando esté listo
-        // await _apiService.put("/tasks/$id", {"isCompleted": value ?? false});
+        await _apiService.patch("tasks/$id", {
+          "isCompleted": value ?? false,
+        }, context: context);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -104,6 +104,7 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       await _storage.saveAccess(data['accessToken']);
+      await _storage.saveRefresh(data['refreshToken']);
       return true;
     }
 
