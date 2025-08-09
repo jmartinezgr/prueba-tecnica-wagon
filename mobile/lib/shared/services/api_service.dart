@@ -95,6 +95,7 @@ class ApiService {
 
   Future<bool> _refreshToken() async {
     final refreshToken = await _storage.getRefresh();
+    print(refreshToken);
     if (refreshToken == null) return false;
 
     final uri = Uri.parse('$_baseUrl/auth/refresh');
@@ -104,8 +105,8 @@ class ApiService {
       body: jsonEncode({'refreshToken': refreshToken}),
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+    if (response.statusCode == 201) {
+      final data = json.decode(response.body);
       await _storage.saveAccess(data['accessToken']);
       await _storage.saveRefresh(data['refreshToken']);
       return true;

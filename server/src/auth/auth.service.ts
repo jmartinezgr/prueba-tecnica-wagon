@@ -48,14 +48,14 @@ export class AuthService {
   async login(payload: LoginDTO) {
     const user = await this.usersService.findOneByEmail(payload.email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciales erroneas');
     }
     const isPasswordValid = await bcryptjs.compare(
       payload.password,
       user.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciales erroneas');
     }
 
     const JWTpayload = {
