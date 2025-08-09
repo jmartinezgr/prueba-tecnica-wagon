@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/features/home/presentation/views/principal/principal_view.dart';
-import 'package:mobile/features/home/presentation/views/unprogrammed_tasks_view.dart';
+import 'package:mobile/features/home/presentation/views/unprogrammedTasks/unprogrammed_tasks_view.dart';
 import 'package:mobile/features/home/presentation/views/profile_view.dart';
 import 'package:mobile/features/home/presentation/views/createTask/create_task_view.dart';
 import 'package:mobile/shared/services/secure_storage_service.dart';
