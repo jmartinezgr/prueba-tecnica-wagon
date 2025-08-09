@@ -1,3 +1,10 @@
+/**
+ * AuthService handles authentication logic for user registration, login, profile retrieval, and token refresh.
+ *
+ * - Provides methods for registering and logging in users with JWT-based authentication.
+ * - Handles password hashing, token generation, and validation.
+ * - Exposes methods to get user profile and refresh authentication tokens.
+ */
 import {
   BadRequestException,
   Injectable,
@@ -18,6 +25,12 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  /**
+   * Registers a new user, hashes their password, and returns JWT tokens and user data.
+   * @param payload - Registration data (email, password, etc.)
+   * @returns Object containing accessToken, refreshToken, and user info (without password).
+   * @throws BadRequestException if the user already exists.
+   */
   async register(payload: RegisterDTO) {
     const user = await this.usersService.findOneByEmail(payload.email);
     if (user) {
@@ -45,6 +58,12 @@ export class AuthService {
     };
   }
 
+  /**
+   * Authenticates a user and returns JWT tokens and user data if credentials are valid.
+   * @param payload - Login data (email and password).
+   * @returns Object containing accessToken, refreshToken, and user info (without password).
+   * @throws UnauthorizedException if credentials are invalid.
+   */
   async login(payload: LoginDTO) {
     const user = await this.usersService.findOneByEmail(payload.email);
     if (!user) {
@@ -74,6 +93,11 @@ export class AuthService {
     };
   }
 
+  /**
+   * Retrieves the profile of the authenticated user.
+   * @param userPayload - JWT payload containing user identification.
+   * @returns User object without the password field.
+   */
   async getProfile(userPayload: AppJwtPayload) {
     const user = await this.usersService.findOneByEmail(userPayload.email);
     const userWithoutPassword = { ...user, password: undefined };
@@ -81,6 +105,12 @@ export class AuthService {
     return userWithoutPassword;
   }
 
+  /**
+   * Validates and refreshes JWT tokens using a valid refresh token.
+   * @param refreshToken - The refresh token string.
+   * @returns Object containing new accessToken and refreshToken.
+   * @throws UnauthorizedException if the refresh token is invalid or user does not exist.
+   */
   async refreshToken(refreshToken: string) {
     try {
       const payload: AppJwtPayload = this.jwtService.verify(refreshToken);

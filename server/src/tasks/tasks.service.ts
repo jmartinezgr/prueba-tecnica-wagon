@@ -5,6 +5,13 @@ import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, ConnectionStates, Model } from 'mongoose';
 import { Task, TaskDocument } from './schema/task.schema';
 
+/**
+ * TasksService provides business logic for managing user tasks.
+ *
+ * - Handles creation, retrieval, updating, and deletion of tasks in MongoDB.
+ * - Ensures only authorized users can modify or delete their own tasks.
+ * - Validates MongoDB connection on module initialization.
+ */
 @Injectable()
 export class TasksService {
   constructor(
@@ -12,6 +19,10 @@ export class TasksService {
     @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
   ) {}
 
+  /**
+   * Checks MongoDB connection status when the module initializes.
+   * @throws Error if the connection is not established.
+   */
   onModuleInit() {
     const isConnected =
       this.mongoConnection.readyState === ConnectionStates.connected;
@@ -22,6 +33,12 @@ export class TasksService {
     }
   }
 
+  /**
+   * Creates a new task for a user.
+   * @param createTaskDto - Data for the new task.
+   * @param userId - ID of the user creating the task.
+   * @returns The created task document.
+   */
   create(createTaskDto: CreateTaskDto, userId: number) {
     const createdTask = new this.taskModel({
       ...createTaskDto,
@@ -30,6 +47,14 @@ export class TasksService {
     return createdTask.save();
   }
 
+  /**
+   * Finds tasks for a user, optionally filtered by date, status, or scheduling.
+   * @param userId - ID of the user whose tasks to retrieve.
+   * @param date - (Optional) Date string to filter tasks by estimatedDate.
+   * @param status - (Optional) Filter by completion status.
+   * @param scheduled - (Optional) If false, finds unscheduled tasks.
+   * @returns Array of matching task documents.
+   */
   async findUserTasksByUserId(
     userId: number,
     date?: string,
@@ -62,10 +87,24 @@ export class TasksService {
     return this.taskModel.find(query).exec();
   }
 
+  /**
+   * Finds a single task by its ID.
+   * @param id - The task's MongoDB document ID.
+   * @returns The found task document or null.
+   */
   findOne(id: string) {
     return this.taskModel.findById(id).exec();
   }
 
+  /**
+   * Updates a task if it belongs to the user.
+   * @param id - The task's MongoDB document ID.
+   * @param updateTaskDto - Data to update the task with.
+   * @param userId - ID of the user attempting the update.
+   * @returns The updated task document.
+   * @throws Error if the task is not found.
+   * @throws UnauthorizedException if the user does not own the task.
+   */
   async update(id: string, updateTaskDto: UpdateTaskDto, userId: number) {
     const task = await this.taskModel.findById(id).exec();
     if (!task) {
@@ -85,6 +124,14 @@ export class TasksService {
       .exec();
   }
 
+  /**
+   * Deletes a task if it belongs to the user.
+   * @param id - The task's MongoDB document ID.
+   * @param userId - ID of the user attempting the deletion.
+   * @returns The deleted task document.
+   * @throws Error if the task is not found.
+   * @throws UnauthorizedException if the user does not own the task.
+   */
   async remove(id: string, userId: number) {
     const task = await this.taskModel.findById(id).exec();
     if (!task) {

@@ -1,3 +1,17 @@
+/**
+ * Loads, validates, and exports environment variables for the application.
+ *
+ * - Uses dotenv to load variables from a .env file if not present in process.env.
+ * - Validates required variables using Joi schema.
+ * - Throws an error if validation fails, ensuring the app does not start with missing or invalid config.
+ * - Exports a typed envs object for use throughout the codebase.
+ *
+ * Production Readiness:
+ * - This approach is suitable for production as it enforces presence and type of critical environment variables at startup.
+ * - Ensure that .env files are not used in production; rely on actual environment variables set by the deployment platform.
+ * - Never commit .env files with secrets to version control.
+ * - The SECRET and database credentials must be kept secure and rotated as needed.
+ */
 import * as Joi from 'joi';
 import * as dotenv from 'dotenv';
 

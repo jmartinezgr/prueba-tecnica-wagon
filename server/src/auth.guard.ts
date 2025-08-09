@@ -12,11 +12,28 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { envs } from 'src/config';
 import { AppJwtPayload, AuthenticatedRequest } from './types/auth.guard.types';
-
+/**
+ * AuthGuard is a custom authentication guard for protecting routes using JWT.
+ *
+ * - Validates the presence and validity of a JWT in the Authorization header.
+ * - Attaches the decoded user payload to the request object if valid.
+ * - Throws appropriate UnauthorizedException errors for expired, invalid, or missing tokens.
+ */
 @Injectable()
 export class AuthGuard implements CanActivate {
+  /**
+   * Constructs the AuthGuard with a JwtService instance for token verification.
+   * @param jwtService - Service for handling JWT operations.
+   */
   constructor(private readonly jwtService: JwtService) {}
 
+  /**
+   * Determines if the current request is authenticated by validating the JWT.
+   *
+   * @param context - The execution context containing the HTTP request.
+   * @returns True if authentication is successful; otherwise, throws an exception.
+   * @throws UnauthorizedException if the token is missing, expired, invalid, or not yet valid.
+   */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: AuthenticatedRequest = context
       .switchToHttp()
@@ -48,10 +65,15 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
+  /**
+   * Extracts the Bearer token from the Authorization header of the request.
+   *
+   * @param request - The HTTP request object.
+   * @returns The JWT string if present and properly formatted; otherwise, undefined.
+   */
   private extractToken(request: AuthenticatedRequest): string | undefined {
     const token = request.headers.authorization;
     const [type, tokenValue] = token?.split(' ') ?? [];
-
     return type === 'Bearer' ? tokenValue : undefined;
   }
 }

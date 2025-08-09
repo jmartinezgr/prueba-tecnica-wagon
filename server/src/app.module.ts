@@ -10,6 +10,13 @@ import { AuthService } from './auth/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TasksModule } from './tasks/tasks.module';
 
+/**
+ * The root module of the application.
+ *
+ * - Imports and configures all feature modules, database connections, controllers, and providers.
+ * - Sets up TypeORM for PostgreSQL and Mongoose for MongoDB using environment variables.
+ * - Registers global controllers and services for the application.
+ */
 @Module({
   imports: [
     AuthModule,

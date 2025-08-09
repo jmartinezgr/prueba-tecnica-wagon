@@ -1,3 +1,10 @@
+/**
+ * UsersModule provides the structure for user management features.
+ *
+ * - Imports the TypeOrmModule for the User entity.
+ * - Registers UsersController and UsersService for handling user-related logic and requests.
+ * - Exports UsersService for use in other modules.
+ */
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
