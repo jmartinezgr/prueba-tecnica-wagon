@@ -29,22 +29,19 @@ class TasksListWidget extends StatelessWidget {
       return _buildEmptyState();
     }
 
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          final task = tasks[index];
-          return TaskCardWidget(
-            title: task["title"] ?? "Sin título",
-            description: task["description"] ?? "Sin descripción",
-            isChecked: task["isCompleted"] ?? false,
-            onChanged: (value) => onToggleTask(task["_id"], value),
-            onDelete: () => onDeleteTask(task["_id"]),
-          );
-        },
-      ),
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
+      itemCount: tasks.length,
+      itemBuilder: (context, index) {
+        final task = tasks[index];
+        return TaskCardWidget(
+          title: task["title"] ?? "Sin título",
+          description: task["description"] ?? "Sin descripción",
+          isChecked: task["isCompleted"] ?? false,
+          onChanged: (value) => onToggleTask(task["_id"], value),
+          onDelete: () => onDeleteTask(task["_id"]),
+        );
+      },
     );
   }
 

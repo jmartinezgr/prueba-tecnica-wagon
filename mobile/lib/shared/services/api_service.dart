@@ -32,4 +32,34 @@ class ApiService {
       body: jsonEncode(body),
     );
   }
+
+  Future<http.Response> patch(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
+    final token = await _storage.getAccess();
+    final uri = Uri.parse('http://10.0.2.2:3000/api/v1/$endpoint');
+
+    return await http.patch(
+      uri,
+      headers: {
+        'Authorization': token != null ? 'Bearer $token' : '',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+  }
+
+  Future<http.Response> delete(String endpoint) async {
+    final token = await _storage.getAccess();
+    final uri = Uri.parse('http://10.0.2.2:3000/api/v1/$endpoint');
+
+    return await http.delete(
+      uri,
+      headers: {
+        'Authorization': token != null ? 'Bearer $token' : '',
+        'Content-Type': 'application/json',
+      },
+    );
+  }
 }
