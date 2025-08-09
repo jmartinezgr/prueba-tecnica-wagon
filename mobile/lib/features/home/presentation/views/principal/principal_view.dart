@@ -18,7 +18,8 @@ class PrincipalView extends StatefulWidget {
   State<PrincipalView> createState() => _PrincipalViewState();
 }
 
-class _PrincipalViewState extends State<PrincipalView> {
+class _PrincipalViewState extends State<PrincipalView>
+    with AutomaticKeepAliveClientMixin {
   final ApiService _apiService = ApiService();
   final DaysService _daysService = DaysService();
   List<Map<String, dynamic>> _tasks = [];
@@ -28,11 +29,20 @@ class _PrincipalViewState extends State<PrincipalView> {
   int _selectedDayIndex = -1;
   int _weekOffset = 0;
 
+  // Para mantener el estado cuando se cambia de pestaña
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
+    _initializeView();
+  }
+
+  // Método principal para inicializar/recargar la vista
+  Future<void> _initializeView() async {
     _loadWeekDays();
-    _fetchTasksForSelectedDay();
+    await _fetchTasksForSelectedDay();
   }
 
   void _loadWeekDays() {
@@ -70,6 +80,11 @@ class _PrincipalViewState extends State<PrincipalView> {
         ),
       );
     }
+  }
+
+  // Método público para recargar desde el exterior
+  Future<void> refresh() async {
+    await _initializeView();
   }
 
   Future<void> _deleteTask(dynamic id) async {
@@ -167,6 +182,8 @@ class _PrincipalViewState extends State<PrincipalView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Necesario para AutomaticKeepAliveClientMixin
+
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       body: Column(

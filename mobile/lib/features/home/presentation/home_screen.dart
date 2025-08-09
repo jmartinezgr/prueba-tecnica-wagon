@@ -20,6 +20,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   Map<String, dynamic>? user;
 
+  // Keys para forzar reconstrucción de las vistas
+  GlobalKey<State> _principalViewKey = GlobalKey<State>();
+  GlobalKey<State> _unprogrammedTasksKey = GlobalKey<State>();
+
   @override
   void initState() {
     super.initState();
@@ -42,11 +46,41 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) context.go('/auth');
   }
 
+  void _onTabChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    // Si regresa al Dashboard (índice 0), forzar recarga
+    if (index == 0) {
+      _refreshPrincipalView();
+    }
+
+    // Si regresa a Tareas No Programadas (índice 2), forzar recarga
+    if (index == 2) {
+      _refreshUnprogrammedTasks();
+    }
+  }
+
+  void _refreshPrincipalView() {
+    // Forzar reconstrucción del PrincipalView creando un nuevo key
+    setState(() {
+      _principalViewKey = GlobalKey<State>();
+    });
+  }
+
+  void _refreshUnprogrammedTasks() {
+    // Forzar reconstrucción del UnprogrammedTasksView creando un nuevo key
+    setState(() {
+      _unprogrammedTasksKey = GlobalKey<State>();
+    });
+  }
+
   List<Widget> _getScreens() {
     return [
-      PrincipalView(user: user),
+      PrincipalView(key: _principalViewKey, user: user),
       const CreateTaskView(),
-      const UnprogrammedTasksView(),
+      UnprogrammedTasksView(key: _unprogrammedTasksKey),
       ProfileView(user: user, onLogout: _logout),
     ];
   }
@@ -54,16 +88,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 2,
-        backgroundColor: Colors.white, // Puedes cambiar el color aquí
-      ),
+      appBar: AppBar(elevation: 2, backgroundColor: Colors.white),
       body: user == null
           ? const Center(child: CircularProgressIndicator())
           : IndexedStack(index: _currentIndex, children: _getScreens()),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: _onTabChanged, // Usar la nueva función
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
@@ -74,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Agregar'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list), // Cambiado a un ícono de lista
+            icon: Icon(Icons.list),
             label: 'No Programadas',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),

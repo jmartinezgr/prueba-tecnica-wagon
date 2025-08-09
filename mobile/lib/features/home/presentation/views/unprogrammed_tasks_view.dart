@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:mobile/shared/services/api_service.dart';
+import 'package:mobile/shared/widgets/confirm_dialog.dart';
 import 'package:mobile/shared/widgets/tasks_list_widget.dart';
 
 // Vista principal de Tareas No Programadas
@@ -14,16 +15,31 @@ class UnprogrammedTasksView extends StatefulWidget {
   State<UnprogrammedTasksView> createState() => _UnprogrammedTasksViewState();
 }
 
-class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView> {
+class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
+    with AutomaticKeepAliveClientMixin {
   final ApiService _apiService = ApiService();
   List<Map<String, dynamic>> _tasks = [];
   bool _isLoading = true;
   bool _isLoadingTasks = false;
 
+  // Para mantener el estado cuando se cambia de pestaña
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
-    _loadTasks();
+    _initializeView();
+  }
+
+  // Método principal para inicializar/recargar la vista
+  Future<void> _initializeView() async {
+    await _loadTasks();
+  }
+
+  // Método público para recargar desde el exterior
+  Future<void> refresh() async {
+    await _initializeView();
   }
 
   Future<void> _loadTasks() async {
@@ -31,12 +47,14 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView> {
       setState(() => _isLoading = true);
 
       // Cambia este endpoint por el que necesites para tareas no programadas
-      final response = await _apiService.get('/tasks/unprogrammed');
+      final response = await _apiService.get(
+        'tasks?sheduled=false',
+        context: context,
+      );
       final data = json.decode(response.body);
-
       if (mounted) {
         setState(() {
-          _tasks = List<Map<String, dynamic>>.from(data['tasks'] ?? []);
+          _tasks = List<Map<String, dynamic>>.from(data ?? []);
           _isLoading = false;
         });
       }
@@ -53,9 +71,9 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView> {
       setState(() => _isLoadingTasks = true);
 
       // Cambia este endpoint por el que necesites para actualizar tareas
-      await _apiService.patch('/tasks/$taskId', {
+      await _apiService.patch('tasks/$taskId', {
         'isCompleted': isCompleted ?? false,
-      });
+      }, context: context);
 
       // Actualizar el estado local
       setState(() {
@@ -81,8 +99,21 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView> {
     try {
       setState(() => _isLoadingTasks = true);
 
+      final shouldDelete = await ConfirmDialog.show(
+        context: context,
+        title: 'Confirmar eliminación',
+        message: '¿Estás seguro de que deseas eliminar esta tarea?',
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+        icon: Icons.warning_amber_rounded,
+        iconColor: Colors.orange.shade600,
+        confirmColor: Colors.red.shade600,
+      );
+
+      if (!shouldDelete) return;
+
       // Cambia este endpoint por el que necesites para eliminar tareas
-      await _apiService.delete('/tasks/$taskId');
+      await _apiService.delete('tasks/$taskId', context: context);
 
       // Remover de la lista local
       setState(() {
@@ -111,6 +142,8 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Necesario para AutomaticKeepAliveClientMixin
+
     return Scaffold(
       appBar: AppBar(title: const Text('Tareas No Programadas')),
       body: TasksListWidget(
