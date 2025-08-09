@@ -7,6 +7,8 @@ import { envs } from './config';
 import { UsersModule } from './users/users.module';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { AuthService } from './auth/auth.service';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    MongooseModule.forRoot(envs.MONGO_URI, {}),
     UsersModule,
+    TasksModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService],
