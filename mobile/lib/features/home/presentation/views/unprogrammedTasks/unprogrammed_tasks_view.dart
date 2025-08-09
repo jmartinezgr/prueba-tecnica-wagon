@@ -48,7 +48,7 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
 
       // Cambia este endpoint por el que necesites para tareas no programadas
       final response = await _apiService.get(
-        'tasks?sheduled=false',
+        'tasks?scheduled=false',
         context: context,
       );
       final data = json.decode(response.body);
