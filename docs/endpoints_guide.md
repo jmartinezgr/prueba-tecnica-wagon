@@ -98,6 +98,202 @@ A continuación se detalla la documentación completa de cada endpoint disponibl
 
 ---
 
+## Módulo de Tareas (Tasks)
+
+**Prefijo de rutas:** `/tasks`
+
+> **Nota:** Todos los endpoints de este módulo requieren autenticación mediante Bearer Token en el header `Authorization`.
+
+### POST `/tasks`
+**Descripción:** Crear una nueva tarea para el usuario autenticado
+
+**Headers requeridos:**
+```
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+**Parámetros del body:**
+```json
+{
+  "title": "string",
+  "description": "string",
+  "dueDate": "2025-08-10T14:30:00.000Z",
+  "priority": "high | medium | low",
+  "completed": false
+}
+```
+
+**Respuesta exitosa (201):**
+```json
+{
+  "_id": "66b5a1b2c3d4e5f6a7b8c9d0",
+  "title": "Completar documentación",
+  "description": "Finalizar la documentación de la API",
+  "dueDate": "2025-08-10T14:30:00.000Z",
+  "priority": "high",
+  "completed": false,
+  "userId": "12345",
+  "createdAt": "2025-08-09T10:15:30.000Z",
+  "updatedAt": "2025-08-09T10:15:30.000Z"
+}
+```
+
+**Errores comunes:**
+- `401 Unauthorized`: Token inválido o expirado
+- `400 Bad Request`: Datos de entrada inválidos
+
+---
+
+### GET `/tasks`
+**Descripción:** Obtener todas las tareas del usuario autenticado con filtros opcionales
+
+**Headers requeridos:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Parámetros de consulta (opcionales):**
+- `date` (string): Filtrar por fecha específica (formato: YYYY-MM-DD)
+- `status` (boolean): Filtrar por estado de completado (true/false)
+- `scheduled` (boolean): Filtrar tareas programadas (true) o sin programar (false)
+
+**Ejemplos de uso:**
+```
+GET /tasks
+GET /tasks?date=2025-08-10
+GET /tasks?status=true
+GET /tasks?scheduled=false&status=false
+```
+
+**Respuesta exitosa (200):**
+```json
+[
+  {
+    "_id": "66b5a1b2c3d4e5f6a7b8c9d0",
+    "title": "Revisar código",
+    "description": "Hacer code review del módulo de auth",
+    "dueDate": "2025-08-10T16:00:00.000Z",
+    "priority": "medium",
+    "completed": false,
+    "userId": "12345",
+    "createdAt": "2025-08-09T10:15:30.000Z",
+    "updatedAt": "2025-08-09T10:15:30.000Z"
+  }
+]
+```
+
+**Errores comunes:**
+- `401 Unauthorized`: Token inválido o expirado
+
+---
+
+### GET `/tasks/:id`
+**Descripción:** Obtener una tarea específica por su ID
+
+**Headers requeridos:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Parámetros de ruta:**
+- `id` (string): ID único de la tarea (ObjectId de MongoDB)
+
+**Respuesta exitosa (200):**
+```json
+{
+  "_id": "66b5a1b2c3d4e5f6a7b8c9d0",
+  "title": "Tarea específica",
+  "description": "Descripción de la tarea",
+  "dueDate": "2025-08-10T14:30:00.000Z",
+  "priority": "low",
+  "completed": true,
+  "userId": "12345",
+  "createdAt": "2025-08-09T10:15:30.000Z",
+  "updatedAt": "2025-08-09T12:30:45.000Z"
+}
+```
+
+**Errores comunes:**
+- `401 Unauthorized`: Token inválido o expirado
+- `404 Not Found`: Tarea no encontrada
+- `400 Bad Request`: ID de tarea inválido
+
+---
+
+### PATCH `/tasks/:id`
+**Descripción:** Actualizar una tarea existente (solo si pertenece al usuario autenticado)
+
+**Headers requeridos:**
+```
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+**Parámetros de ruta:**
+- `id` (string): ID único de la tarea
+
+**Parámetros del body (todos opcionales):**
+```json
+{
+  "title": "string",
+  "description": "string",
+  "dueDate": "2025-08-11T09:00:00.000Z",
+  "priority": "high | medium | low",
+  "completed": true
+}
+```
+
+**Respuesta exitosa (200):**
+```json
+{
+  "_id": "66b5a1b2c3d4e5f6a7b8c9d0",
+  "title": "Tarea actualizada",
+  "description": "Nueva descripción",
+  "dueDate": "2025-08-11T09:00:00.000Z",
+  "priority": "high",
+  "completed": true,
+  "userId": "12345",
+  "createdAt": "2025-08-09T10:15:30.000Z",
+  "updatedAt": "2025-08-09T14:25:10.000Z"
+}
+```
+
+**Errores comunes:**
+- `401 Unauthorized`: Token inválido o expirado
+- `404 Not Found`: Tarea no encontrada o no pertenece al usuario
+- `400 Bad Request`: Datos de entrada inválidos
+
+---
+
+### DELETE `/tasks/:id`
+**Descripción:** Eliminar una tarea (solo si pertenece al usuario autenticado)
+
+**Headers requeridos:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Parámetros de ruta:**
+- `id` (string): ID único de la tarea
+
+**Respuesta exitosa (200):**
+```json
+{
+  "_id": "66b5a1b2c3d4e5f6a7b8c9d0",
+  "title": "Tarea eliminada",
+  "description": "Esta tarea fue eliminada",
+  "deleted": true
+}
+```
+
+**Errores comunes:**
+- `401 Unauthorized`: Token inválido o expirado
+- `404 Not Found`: Tarea no encontrada o no pertenece al usuario
+- `400 Bad Request`: ID de tarea inválido
+
+---
+
 ## Tipos de Datos
 
 ### UserData
@@ -121,6 +317,34 @@ Estructura del objeto usuario devuelto por la API:
 - `createdAt` (string): Fecha de creación en formato ISO
 - `updatedAt` (string): Fecha de última actualización en formato ISO
 - `deletedAt` (string | null): Fecha de eliminación lógica (null si está activo)
+
+### TaskData
+Estructura del objeto tarea devuelto por la API:
+
+```json
+{
+  "_id": "66b5a1b2c3d4e5f6a7b8c9d0",
+  "title": "Ejemplo de tarea",
+  "description": "Descripción detallada de la tarea",
+  "dueDate": "2025-08-10T14:30:00.000Z",
+  "priority": "medium",
+  "completed": false,
+  "userId": "12345",
+  "createdAt": "2025-08-09T10:15:30.000Z",
+  "updatedAt": "2025-08-09T10:15:30.000Z"
+}
+```
+
+**Propiedades:**
+- `_id` (string): Identificador único de la tarea (ObjectId de MongoDB)
+- `title` (string): Título de la tarea
+- `description` (string): Descripción detallada de la tarea
+- `dueDate` (string | null): Fecha límite en formato ISO (opcional)
+- `priority` (string): Prioridad de la tarea ("high", "medium", "low")
+- `completed` (boolean): Estado de completado de la tarea
+- `userId` (string): ID del usuario propietario de la tarea
+- `createdAt` (string): Fecha de creación en formato ISO
+- `updatedAt` (string): Fecha de última actualización en formato ISO
 
 ---
 
