@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -28,9 +29,15 @@ export class TasksController {
     return this.tasksService.create(createTaskDto, userId);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  findUserTasks(
+    @Req() req: authGuardTypes.AuthenticatedRequest,
+    @Query('date') date?: string,
+    @Query('status') status?: boolean,
+  ) {
+    const userId = req.user.sub;
+    return this.tasksService.findUserTasksByUserId(userId, date, status);
   }
 
   @Get(':id')

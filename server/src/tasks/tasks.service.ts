@@ -30,8 +30,24 @@ export class TasksService {
     return createdTask.save();
   }
 
-  findAll() {
-    return this.taskModel.find().exec();
+  async findUserTasksByUserId(userId: number, date?: string, status?: boolean) {
+    const query: Record<string, any> = { userId };
+
+    if (date) {
+      const start = new Date(date);
+      start.setUTCHours(0, 0, 0, 0);
+
+      const end = new Date(start);
+      end.setUTCDate(start.getUTCDate() + 1);
+
+      query.estimatedDate = { $gte: start, $lt: end };
+    }
+
+    if (status !== undefined) {
+      query.isCompleted = status;
+    }
+
+    return this.taskModel.find(query).exec();
   }
 
   findOne(id: number) {
