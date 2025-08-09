@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/features/home/presentation/views/dashboard_view.dart';
+import 'package:mobile/features/home/presentation/views/principal_view.dart';
 import 'package:mobile/features/home/presentation/views/notifications_view.dart';
 import 'package:mobile/features/home/presentation/views/profile_view.dart';
 import 'package:mobile/features/home/presentation/views/search_view.dart';
@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _getScreens() {
     return [
-      DashboardView(user: user),
+      PrincipalView(user: user),
       const SearchView(),
       const NotificationsView(),
       ProfileView(user: user, onLogout: _logout),
