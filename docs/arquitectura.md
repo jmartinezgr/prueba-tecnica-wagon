@@ -1,14 +1,15 @@
 ```mermaid
 graph TD
-  subgraph Cliente
+graph TD
+  subgraph CLIENTE
     A[App Flutter]
   end
 
-  subgraph Backend
+  subgraph BACKEND
     B[NestJS en Azure]
   end
 
-  subgraph Bases_de_Datos
+  subgraph BBDD
     C[(Base de Datos SQL en Railway)]
     D[(Base de Datos NoSQL en Railway)]
   end
