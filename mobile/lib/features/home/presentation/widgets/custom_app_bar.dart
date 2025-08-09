@@ -29,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 2,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade50,
       title: Text(
         _getPageTitle(),
         style: const TextStyle(

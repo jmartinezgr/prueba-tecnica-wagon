@@ -193,6 +193,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: _isEditing
           ? AppBar(
               title: const Text('Editar Tarea'),

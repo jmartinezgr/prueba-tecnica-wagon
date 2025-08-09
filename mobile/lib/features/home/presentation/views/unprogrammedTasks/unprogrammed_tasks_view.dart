@@ -146,7 +146,7 @@ class _UnprogrammedTasksViewState extends State<UnprogrammedTasksView>
     super.build(context); // Necesario para AutomaticKeepAliveClientMixin
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tareas No Programadas')),
+      backgroundColor: Colors.grey.shade50,
       body: TasksListWidget(
         loading: _isLoading,
         isLoadingTasks: _isLoadingTasks,
