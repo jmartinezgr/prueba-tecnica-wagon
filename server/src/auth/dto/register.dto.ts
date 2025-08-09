@@ -12,11 +12,11 @@ export class RegisterDTO {
   @MinLength(3)
   @MaxLength(50)
   @Matches(/^[a-zA-Z\s]+$/, {
-    message: 'Name can only contain letters and spaces',
+    message: 'El nombre solo puede contener letras y espacios',
   })
   name: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'Email en formato inválido' })
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
@@ -27,12 +27,12 @@ export class RegisterDTO {
   )
   @IsString()
   @MinLength(6)
-  @Matches(/^\S*$/, { message: 'Password cannot contain spaces' })
+  @Matches(/^\S*$/, { message: 'La contraseña no puede contener espacios' })
   @Matches(
     /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&+])[A-Za-z\d@$!%*?&+]{6,}$/,
     {
       message:
-        'Password must have at least one uppercase letter, one lowercase letter, one number and one special character',
+        'La contraseña debe tener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial',
     },
   )
   password: string;

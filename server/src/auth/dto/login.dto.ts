@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class LoginDTO {
-  @IsEmail()
+  @IsEmail({}, { message: 'Email en formato inválido' })
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
@@ -12,6 +12,6 @@ export class LoginDTO {
     typeof value === 'string' ? value.trim() : value,
   )
   @IsString()
-  @MinLength(6)
+  @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
   password: string;
 }
